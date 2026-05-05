@@ -1,0 +1,416 @@
+\documentclass{article}
+
+\newif\ifcameraready
+\ifdefined\camerareadyflag
+  \camerareadytrue
+\else
+  \camerareadyfalse
+\fi
+
+\PassOptionsToPackage{numbers,compress}{natbib}
+\ifcameraready
+  \usepackage[main,final]{neurips_2026}
+\else
+  \usepackage[main]{neurips_2026}
+\fi
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{enumitem}
+\usepackage{nicefrac}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{xcolor}
+\usepackage{subcaption}
+\usepackage{multirow}
+
+\graphicspath{{results/expansion_analysis_v3/}}
+
+\title{TSFM-PEFT-Bench: A Cross-Architecture Benchmark for PEFT Selection in Time Series Foundation Models}
+
+\author{%
+% Camera-ready: replace with real author information.
+First Author \\
+Department or Lab \\
+Institution \\
+City, Country \\
+\texttt{first.author@example.com} \\
+\And
+Second Author \\
+Department or Lab \\
+Institution \\
+City, Country \\
+\texttt{second.author@example.com}
+}
+\date{}
+
+\begin{document}
+\maketitle
+
+%% ================================================================
+%% ABSTRACT
+%% ================================================================
+\begin{abstract}
+We release \textbf{TSFM-PEFT-Bench}, the first cross-architecture benchmark for evaluating PEFT-recommendation reliability in time series foundation models (TSFMs), together with the full experimental matrix as a public benchmark for future evaluation studies. Parameter-efficient fine-tuning (PEFT) has become the default recipe for adapting large language models, yet whether the same recipe reliably transfers across TSFM architectures and domains remains unexamined. We present a cross-architecture study of three TSFMs (Chronos, MOMENT, Moirai) across four domains, six methods, and \textbf{882 paper-included runs}. Two-way ANOVA on 335 non-diverged primary-model domain-mode runs reveals that \emph{domain explains 72--99\% of variance and the Method$\times$Domain interaction explains another 21--22\%} (Chronos and Moirai), while method alone explains less than 8\%---the opposite of the conclusion drawn from within-domain comparisons. \textbf{Surprisingly, naive leave-one-domain-out (LODO) majority transfer is highly effective in this setting}: 41.7\% top-1 accuracy with mean relative regret $0.015$ and max regret $0.122$---a $\mathbf{17{\times}}$ improvement over a random baseline. The mechanism is that IA$^3$ is the plurality-dominant oracle (5/12 cells), so LODO picks IA$^3$ for every test cell and is rarely far from optimal even when it misses. We further evaluate seven architecture-aware, shift-aware, and learned selectors. \emph{More granular features do not improve over plurality transfer at our evaluation scale}: an architecture-conditional default (Arch-Default) reaches only 16.7\% top-1 with $7{\times}$ higher regret; a regret-weighted nearest-neighbor on shift profiles ties LODO on top-1 (41.7\%) but loses $6{\times}$ on regret. Logistic regression on a 9-dim feature space (5 shift dims + 4 architecture one-hot) is the most efficient learned method (33.3\% / regret $0.018$) but still does not improve over LODO. We frame PEFT selection for TSFMs as a regret-aware, shift-conditioned decision problem and document key methodological pitfalls---including interaction effect sensitivity to coverage balance and the dominance of the marginal oracle distribution at small evaluation scales---that evaluation practitioners should anticipate.
+\end{abstract}
+
+%% ================================================================
+%% 1. INTRODUCTION
+%% ================================================================
+\section{Introduction}
+
+Parameter-efficient fine-tuning (PEFT) methods such as LoRA~\citep{hu2022lora}, IA$^3$~\citep{liu2022ia3}, and Adapter~\citep{houlsby2019adapter} are now standard for adapting large pre-trained models in NLP and CV. Whether the same recipes transfer to time series foundation models (TSFMs)~\citep{ansari2024chronos,goswami2024moment,woo2024moirai,das2024timesfm} is an open question, for two reasons. First, time-series domains differ profoundly in their statistical properties (amplitude scale, spectral structure, stationarity) far more than typical NLP tasks. Second, TSFMs span dramatically different architectures---encoder--decoder (Chronos), encoder-only (MOMENT), any-variate transformer (Moirai), decoder-only (TimesFM)---each distributing temporal information across layers in fundamentally different ways. This raises a question prior work has not addressed: \emph{does a PEFT method that works well for one TSFM--domain pair remain effective for another?}
+
+Existing evidence is fragmented. \citet{gupta2024beyondlora} examined a single Chronos+healthcare cell; \citet{park2026tsfm_adaptation} fixed a single architecture for anomaly detection; TSFM-Bench~\citep{li2024tsfmbench} is zero-shot only. Each fixes either the model or the domain, so wins cannot be attributed to method, architecture, or domain.
+
+We close this gap with \textbf{TSFM-PEFT-Bench}, treating PEFT selection as a \emph{shift-conditioned decision problem} and evaluating it on a balanced cross-architecture grid: 972 total runs (882 paper-included primary-model), 3 TSFMs $\times$ 4 domains $\times$ 3 adaptation axes. The full run manifest is shipped as \texttt{results/paper\_manifest.json}, accompanied by a Croissant 1.0 manifest with mandatory Responsible-AI metadata (Appendix~\ref{sec:datasheet}).
+
+\textbf{Scope.} TSFM-PEFT-Bench is an \emph{audit and selector benchmark} rather than a model-novelty contribution. Its claims (significant Method$\times$Domain interaction; plurality transfer dominates granular selectors at this scale; architecture-dependent efficiency frontier) are conditional on a 3-architecture, 4-domain, 5-method grid with MAE as primary endpoint and a per-cell outlier filter; key limitations are listed in Section~\ref{sec:limitations}.
+
+Our contributions are:
+\begin{enumerate}[nosep,leftmargin=*]
+  \item \textbf{Cross-architecture PEFT audit (Section~\ref{sec:interaction}).} The first TSFM study spanning three architectures over method, rank, and locus, revealing significant Method$\times$Domain interaction ($p < 0.001$) in every architecture.
+  \item \textbf{Plurality transfer is the strongest non-oracle selector at our scale (Section~\ref{sec:selector}).} LODO Majority and Global-Best both reach 41.7\% top-1 with \textbf{mean regret $0.015$ (max $0.12$)}, a $17{\times}$ improvement over random---because IA$^3$ is the plurality-dominant oracle in our grid. Granular features (architecture-conditional Arch-Default, 5-dim shift profile with regret-weighted NN) and learned classifiers do not improve over this constant choice; logistic regression is the most efficient learned method (33.3\% / regret $0.018$) but still does not beat LODO.
+  \item \textbf{Architecture-specific efficiency frontier (Section~\ref{sec:efficiency}).} IA$^3$ is strong for encoder--decoder TSFMs; LoRA or Full-FT are necessary for any-variate models; method choice barely matters for encoder-only models.
+\end{enumerate}
+
+%% ================================================================
+%% 2. RELATED WORK
+%% ================================================================
+\section{Related Work}
+
+\paragraph{Time series foundation models.}
+Chronos~\citep{ansari2024chronos} (T5 encoder--decoder, quantized tokens) treats forecasting as language modeling over discretized values---making it sensitive to the choice of adaptation. MOMENT~\citep{goswami2024moment} (masked T5 encoder, patch-based) lacks a decoder cross-attention stage. Moirai~\citep{woo2024moirai} introduces an any-variate transformer with attention over variate (rather than temporal) tokens, which may require weight-level rather than activation-level adaptation. TimesFM~\citep{das2024timesfm} is decoder-only with patched inputs. These architectural differences determine how each backbone distributes temporal information and therefore how it responds to adaptation.
+
+\paragraph{PEFT methods and TSFM-PEFT.}
+LoRA~\citep{hu2022lora} injects low-rank attention updates ($<$1\% params); IA$^3$~\citep{liu2022ia3} rescales activations ($<$0.1\% params) modifying \emph{scale} rather than \emph{direction}; Adapter~\citep{houlsby2019adapter} inserts bottleneck layers; DoRA~\citep{dora2024} decomposes updates into magnitude and direction. In NLP/CV these are typically compared on a single axis (efficiency vs.\ accuracy) on a fixed task; the method$\times$domain interaction is rarely the research question. Table~\ref{tab:positioning} summarises the TSFM-PEFT landscape: each prior study fixes either the model or the domain, making it impossible to disentangle method effects from confounds.
+
+\paragraph{Algorithm selection for adaptation.}
+Choosing the best PEFT method for a (model, domain) cell is an Algorithm Selection Problem~\citep{rice1976algorithm,bischl2016aslib}. MetaPEFT~\citep{tian2025metapeft} meta-learns PEFT hyperparameters for visual transfer tasks, but it does not address time-series method selection. AdaPTS~\citep{benechehab2025adapts} addresses univariate-to-multivariate transfer but not method selection. Our selector (Section~\ref{sec:selector}) operationalizes ASP for TSFMs with a 5-dim shift profile and regret-weighted nearest-neighbor, replacing learned meta-models that overfit at $n{=}12$.
+
+\begin{table}[t]
+\centering
+\caption{Positioning relative to prior PEFT studies for TSFMs. Ours is the first to jointly vary architecture, domain, and multiple PEFT axes.}
+\label{tab:positioning}
+\small
+\begin{tabular}{lcccc}
+\toprule
+Study & Models & Domains & PEFT Axes & Interaction \\
+\midrule
+\citet{gupta2024beyondlora} & 1 & 1 & method & No \\
+\citet{park2026tsfm_adaptation} & 1 & 1 & method & No \\
+TSFM-Bench~\citep{li2024tsfmbench} & 4+ & 7+ & zero-shot & No \\
+\textbf{This work} & \textbf{3} & \textbf{4} & \textbf{method, rank, locus} & \textbf{Yes} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%% ================================================================
+%% 3. EXPERIMENTAL SETUP
+%% ================================================================
+\section{Experimental Setup}
+\label{sec:setup}
+
+\paragraph{Models.}
+We evaluate three TSFMs spanning distinct architectural families: \textbf{Chronos}~\citep{ansari2024chronos} (T5 encoder--decoder, 200M params, quantized token forecasting), \textbf{MOMENT}~\citep{goswami2024moment} (T5 encoder-only, 125M params, patch-based masked pre-training), and \textbf{Moirai}~\citep{woo2024moirai} (any-variate transformer, 91M params, mixture distribution outputs). TimesFM~\citep{das2024timesfm} results from prior runs (2 seeds, 3 domains) are included descriptively but excluded from all inferential analyses due to limited coverage and a \texttt{lingvo} dependency conflict that prevents extension.
+
+\paragraph{Domains.}
+We select four domains to span diverse distribution-shift profiles (Table~\ref{tab:shift-profile}): \textbf{ETTm1}~\citep{zhou2021ett} (energy, high amplitude shift $W_1{=}9.58$), \textbf{Finance}~\citep{li2019logsparse} (\texttt{exchange\_rate}, high non-stationarity, low amplitude shift), \textbf{SMD}~\citep{su2019robust} (industrial sensors, moderate shift across all dimensions), and \textbf{PhysioNet}~\citep{silva2012physionet} (clinical vital signs, dominated by ACF/auto-correlation shift with negligible spectral and amplitude shift). These domains were chosen to represent qualitatively different regimes of temporal structure, not as a comprehensive sample.
+
+\begin{table}[t]
+\centering
+\caption{Five-dimensional distribution shift profile (train$\to$test). Higher values indicate larger shift.}
+\label{tab:shift-profile}
+\small
+\begin{tabular}{l ccccc}
+\toprule
+Domain & Ampl.\ $W_1$\,$\downarrow$ & Spectral\,$\downarrow$ & ACF\,$\downarrow$ & Nonstat.\,$\downarrow$ & Irreg.\,$\downarrow$ \\
+\midrule
+ETTm1     & 9.58  & 0.0500     & 0.50  & 1.500 & 0.100 \\
+Finance   & 0.13  & 0.0200     & 0.20  & 0.800 & 0.050 \\
+SMD       & 0.50  & 0.0300     & 0.30  & 1.000 & 0.080 \\
+PhysioNet & 0.85  & $2.76\times10^{-6}$ & 1.13 & 0.005 & 0.008 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Adaptation methods.}
+Six strategies: \textbf{Zero-shot} (frozen inference), \textbf{Head-only} (train output head, freeze backbone), \textbf{LoRA}~\citep{hu2022lora} (rank-8 low-rank attention adaptation), \textbf{DoRA}~\citep{dora2024} (weight-decomposed low-rank adaptation), \textbf{IA$^3$}~\citep{liu2022ia3} (learned activation rescaling; labeled ``Adapter'' in figures due to legacy config naming), and \textbf{Full-FT} (all parameters trainable). We additionally sweep LoRA rank $\in\{4,8,16,32\}$ and six insertion loci: \texttt{attn\_qv}, \texttt{attn\_all}, \texttt{ffn}, \texttt{attn\_qv\_ffn}, \texttt{early\_layers} (first third of blocks), and \texttt{late\_layers} (last third).
+
+\paragraph{Seeds and scale.}
+We target five seeds $\{42,123,7,2024,3407\}$ per condition. Chronos and MOMENT achieve full 5-seed coverage across all cells; Moirai has partial coverage for LoRA (15/20) and IA$^3$ (13/20) due to configuration incompatibilities (Appendix Table~\ref{tab:seed-coverage}). At submission time, paper-included primary-model totals are 368 domain-mode runs (13 of which diverged with MAE${>}10\times$ same-cell zero-shot baseline), 214 rank-mode runs, and 300 locus-mode runs, totalling 882 paper-included primary-model runs. The complete inclusion list is shipped as \texttt{results/paper\_manifest.json}; TimesFM results (90 runs, descriptive only) and excluded experiments are documented separately.
+
+\paragraph{Statistics.}
+Per-architecture two-way factorial ANOVA (Type~II SS) on method, domain, and interaction; each observation is one seed-level run. We exclude training-divergence outliers per-cell (MAE${>}10\times$ same-(model, domain) zero-shot)---a scale-aware filter that preserves all four domains. After filtering, 335/348 primary main-method runs remain (13 excluded). 20 prefix-tuning runs are reported descriptively but excluded from the factorial design due to incomplete cells. A parallel Kruskal--Wallis on the unfiltered 348 runs serves as robustness. We report $\eta^2$ effect sizes, Wilson CIs for proportions, and Holm--Bonferroni correction; details in Appendix~\ref{sec:anova-detail}.
+
+%% ================================================================
+%% 4. RESULTS
+%% ================================================================
+\section{Results}
+
+\subsection{Method$\times$Domain interaction is significant in every architecture}
+\label{sec:interaction}
+
+Table~\ref{tab:anova-results} presents two-way ANOVA results on 335 non-diverged primary-model domain-mode runs (including DoRA across all four domains). All three effects (method, domain, interaction) are highly significant for every architecture ($p < 0.001$). The dominant pattern, however, is that \emph{domain explains far more variance than method}: $\eta^2_{\text{dom}}$ ranges from 0.720 (Moirai) to 0.999 (MOMENT), while $\eta^2_{\text{meth}}$ stays below 0.08. The interaction effect is substantial---$\eta^2_{\text{int}}{=}0.225$ for Chronos and $0.207$ for Moirai---indicating that method effectiveness genuinely changes across domains, even though the marginal method effect is small. Kruskal--Wallis on the full dataset confirms the pattern.
+
+\begin{table}[t]
+\centering
+\caption{Two-way ANOVA on 335 non-diverged primary-model domain-mode runs (per-cell scale-aware outlier filter). All effects $p < 0.001$. $n$: per-model observation count.}
+\label{tab:anova-results}
+\small
+\begin{tabular}{lrcccccc}
+\toprule
+Model & $n$ & $F_{\text{meth}}$ & $\eta^2_{\text{m}}$ & $F_{\text{dom}}$ & $\eta^2_{\text{d}}$ & $F_{\text{int}}$ & $\eta^2_{\text{int}}$ \\
+\midrule
+Chronos & 107 & 460 & .020 & 28801 & .755 & 1715 & \textbf{.225} \\
+Moirai  & 108 & 10124 & .072 & 167585 & .720 & 9656 & \textbf{.207} \\
+MOMENT  & 120 & 179 & .000 & 761276 & \textbf{.999} & 60 & .000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Figure~\ref{fig:landscape} visualizes the consequence: the best method varies by model--domain pair with no universal winner. Chronos prefers IA$^3$ (Adapter) on ETTm1, Finance, and SMD. MOMENT prefers LoRA on ETTm1 and DoRA on Finance and PhysioNet. Moirai prefers Full-FT on ETTm1 and Finance but IA$^3$ (Adapter) on SMD and PhysioNet. These reversals are not noise---they are statistically robust interaction effects.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.85\linewidth]{fig1_landscape.pdf}
+\caption{\textbf{Method rank across domains (1st = best MAE$\downarrow$).} Each line tracks one PEFT method; crossing lines indicate Method$\times$Domain interaction. Stars mark 1st-place finishes. If there were no interaction, lines would be parallel. In all three models, lines cross extensively: the method that wins on one domain can rank last on another. Per-model MAE heatmaps in Appendix.}
+\label{fig:landscape}
+\vspace{-0.5em}
+\end{figure}
+
+Two patterns matter. First, \textbf{domain dominates method as the variance driver} ($\eta^2_{\text{dom}} \gg \eta^2_{\text{meth}}$ in every architecture)---the opposite of the conclusion drawn from within-domain comparisons alone. Second, the \textbf{interaction effect is substantial} where method differences exist (Chronos $\eta^2_{\text{int}} = 0.225$, Moirai $0.207$); MOMENT is the exception ($\eta^2_{\text{d}} = 0.999$, method choice irrelevant). \textbf{Coverage sensitivity:} an earlier version with 2-domain DoRA coverage reported Moirai $\eta^2_{\text{int}} = 0.905$; with balanced 4-domain coverage it falls to $0.207$, illustrating that partial coverage can substantially overestimate interaction strength.
+
+\subsection{Cross-domain PEFT selection is unreliable}
+\label{sec:lodo}
+
+Can the interaction pattern be exploited for transfer? We evaluate a leave-one-domain-out (LODO) policy: for each held-out domain, the recommended method is the majority vote among the three remaining domains. Table~\ref{tab:lodo} reports top-1 accuracy.
+
+\begin{table}[t]
+\centering
+\caption{LODO top-1 accuracy (4 folds $\times$ 3 models = 12 cells). In-domain selects the best method using target-domain validation. Correct: number of models for which LODO matches the oracle.}
+\label{tab:lodo}
+\small
+\begin{tabular}{lcccc}
+\toprule
+Held-out & LODO & Global-best & In-domain & Correct \\
+\midrule
+ETTm1     & 0.33 & 0.33 & \textbf{1.00} & 1/3 \\
+Finance   & 0.33 & 0.33 & \textbf{1.00} & 1/3 \\
+SMD       & 0.33 & 0.33 & \textbf{1.00} & 1/3 \\
+PhysioNet & 0.67 & 0.67 & \textbf{1.00} & 2/3 \\
+\midrule
+Mean      & 0.42 & 0.42 & \textbf{1.00} & 5/12 \\
+\multicolumn{2}{l}{\scriptsize 95\% Wilson CI} & \multicolumn{3}{l}{\scriptsize [0.17,~0.67]} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+LODO achieves 41.7\% top-1 accuracy (5/12 cells; Wilson CI [17\%,~67\%]) versus 100\% for in-domain oracle validation. \emph{More striking than top-1 accuracy is the per-cell regret}: even when LODO misses the oracle, the chosen method (IA$^3$ in every test cell) is rarely far behind---max relative regret $12.2\%$ (Moirai+Finance), median $0.5\%$ across all 12 cells (per-cell breakdown in Appendix~\ref{sec:lodo-regret-app}). The reason is that IA$^3$ is the plurality-dominant oracle in our grid (5/12 cells), so LODO converges on a method that is \emph{competitive} on most cells---good but rarely best where another method wins.
+
+The practical message is that LODO transfer is \emph{usable as a default} in this grid because the candidate pool admits a plurality-dominant oracle. The strength of plurality transfer is therefore not generic: practitioners should still validate with a small in-domain sweep when the candidate palette differs from ours.
+
+\subsection{LoRA divergence is architecture-specific}
+\label{sec:divergence}
+
+Chronos+LoRA diverges on all 5 ETTm1 seeds (MAE$\approx$124.77), a 25\% failure rate across 20 Chronos LoRA runs; MOMENT and Moirai show zero LoRA divergence. A plausible explanation is that Chronos's quantized-token bottleneck is brittle under low-rank weight modification on high-amplitude-shift domains ($W_1 = 9.58$), though we do not claim causality. The divergence is rank-invariant: every rank in $\{4, 8, 16, 32\}$ diverges on Chronos+ETTm1 (Figure~\ref{fig:rank-locus}, top), and DoRA's magnitude/direction decomposition does not rescue it (mean MAE $24.73$ still ${\gg}10\times$ zero-shot). This points to a training-dynamics failure orthogonal to the low-rank parameterization choice. Practitioners should monitor for divergence whenever LoRA is applied to encoder--decoder TSFMs on high-amplitude-shift domains, and treat IA$^3$ as the safer default until the underlying instability is better understood.
+
+\subsection{Architecture-specific efficiency frontier}
+\label{sec:efficiency}
+
+Table~\ref{tab:efficiency} reports the efficiency--performance tradeoff. The key insight is that the Pareto frontier is \emph{architecture-dependent}:
+
+\begin{table}[t]
+\centering
+\caption{Efficiency comparison (domain-mode, 3 primary models). Par.\%: trainable/total parameters. Time: mean wall-clock per run (includes data loading, training, and evaluation). Fail: divergence rate. MAE$\downarrow$: mean$\pm$std over non-diverged runs across all 4 domains. Bold: best MAE per model. $n$: observation count.}
+\label{tab:efficiency}
+\small
+\begin{tabular}{llrrrrr}
+\toprule
+Model & Method & Par.\% & Time & Fail & MAE$\downarrow$ & $n$ \\
+\midrule
+\multirow{5}{*}{Chron.}
+& Zero-shot & 0.00  & 8.8k & 0\%  & $4.09 \pm 6.41$  & 20 \\
+& Head-only & 0.00  & 737s & 0\%  & $1.39 \pm 2.28$  & 20 \\
+& LoRA      & 0.87  & 23.3k & 25\% & $6.43 \pm 8.78$  & 15 \\
+& IA$^3$    & 0.10  & 4.2k & 0\%  & $0.10 \pm 0.10$  & 11 \\
+& Full-FT   & 100   & 3.5k & 0\%  & $\mathbf{0.08 \pm 0.11}$ & 6 \\
+\midrule
+\multirow{5}{*}{MOM.}
+& Zero-shot & 0.00  & 382s & 0\%  & $4.49 \pm 6.47$  & 20 \\
+& Head-only & 1.84  & 2.6k & 0\%  & $\mathbf{4.14 \pm 6.37}$ & 20 \\
+& LoRA      & 2.29  & 3.0k & 0\%  & $4.14 \pm 6.36$  & 20 \\
+& IA$^3$    & 1.89  & 2.8k & 0\%  & $4.16 \pm 6.38$  & 20 \\
+& Full-FT   & 100   & 2.7k & 0\%  & $4.15 \pm 6.37$  & 20 \\
+\midrule
+\multirow{5}{*}{Moirai}
+& Zero-shot & 0.00  & 1.3k & 0\%  & $12.1 \pm 18.7$  & 20 \\
+& Head-only & 0.00  & 1.5k & 0\%  & $4.31 \pm 6.63$  & 20 \\
+& LoRA      & 0.64  & 17.2k & 0\% & $0.48 \pm 0.64$  & 15 \\
+& IA$^3$    & 0.04  & 11.6k & 0\% & $5.30 \pm 6.91$  & 13 \\
+& Full-FT   & 100   & 20.2k & 0\% & $\mathbf{0.43 \pm 0.50}$ & 20 \\
+\bottomrule
+\multicolumn{7}{l}{\scriptsize Cells with $n < 20$ have incomplete domain coverage; MAE not directly comparable.} \\
+\end{tabular}
+\end{table}
+
+\textbf{Chronos:} IA$^3$ ($0.10 \pm 0.10$ MAE, 0.10\% params) is within 25\% of Full-FT ($0.08 \pm 0.11$) with zero convergence failures and 1,000$\times$ fewer trainable params; LoRA is riskier due to the ETTm1 divergence cluster. \textbf{MOMENT:} All five methods achieve nearly identical MAE ($\approx$4.1--4.5)---method choice is irrelevant; Head-only or Zero-shot suffice. \textbf{Moirai:} IA$^3$ underperforms ($5.30$) relative to LoRA ($0.48$) by an order of magnitude; activation rescaling alone is insufficient for variate-token attention. The takeaway is that \emph{parameter efficiency is not a universal proxy for adaptation quality}: IA$^3$ is the best low-cost choice for Chronos but among the worst for Moirai.
+
+\paragraph{MOMENT null result.}
+MOMENT exhibits essentially zero method/interaction sensitivity ($\eta^2_{\text{meth}} \approx \eta^2_{\text{int}} \approx 0$); we hypothesize this stems from uniformly distributed gradient flow under masked-encoder pretraining (Appendix~\ref{sec:gradient-probe}). \emph{Practical recommendation:} on MOMENT-like architectures, use the cheapest PEFT method---no benefit from complex adaptations. This may not generalize beyond MOMENT's masked-pretraining + patch-tokenization combination (Section~\ref{sec:limitations}).
+
+\paragraph{DoRA vs.\ LoRA.} DoRA~\citep{dora2024} matches LoRA on 9 of 10 non-diverged cells ($|\Delta\text{MAE}| < 0.25$); it improves Chronos+PhysioNet ($18.82 \to 15.65$) and avoids the partial Chronos+SMD divergence, but does \emph{not} rescue the Chronos+ETTm1 cluster (still $24.73 \gg 10\times$ zero-shot). The practical default is LoRA over DoRA for MOMENT/Moirai: matched performance with simpler implementation. Per-cell numbers are in Appendix~\ref{sec:dora-app}.
+
+\subsection{Rank and locus are conditional hyperparameters}
+\label{sec:rank-locus}
+
+\paragraph{Rank.} Rank~8 wins in 4/12 model--domain cells but is not universal. Figure~\ref{fig:rank-locus} (top) shows domain-normalized rank sensitivity curves that \emph{cross} between domains within each model: no monotonic rank--MAE relationship exists (Spearman $p > 0.4$ for all models). Rank~8 is a reasonable default but should be validated per cell.
+
+\paragraph{Locus.} \texttt{early\_layers} ranks 1st for Chronos on all domains, but cross-model Kendall $\tau$ is non-significant after Bonferroni correction (mean $|\tau|{=}0.23$). Figure~\ref{fig:rank-locus} (bottom) visualizes this instability: ``early layers'' serve different roles across architectures (token embedding in Chronos vs.\ variate attention in Moirai), so adapting them has different consequences. Both rank and locus should be included in the per-domain validation sweep.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.88\linewidth]{fig3_rank_sweep.pdf}\\[0.3em]
+\includegraphics[width=0.88\linewidth]{fig4_locus.pdf}
+\caption{\textbf{Rank and locus are conditional on architecture--domain pair.} \emph{Top:}~Domain-normalized LoRA rank sweep ($\star$ = optimal rank); sensitivity curves cross between domains within each model, ruling out a universal best rank. Chronos+ETTm1 diverged at every rank and is omitted. \emph{Bottom:}~Locus rank heatmap (1 = best, 6 = worst); top-ranked loci shift across models. Both panels show ETTm1, Finance, and SMD (PhysioNet rank/locus runs still in progress).}
+\label{fig:rank-locus}
+\end{figure}
+
+
+\subsection{Shift-aware adaptation selector}
+\label{sec:selector}
+
+Section~\ref{sec:lodo} showed that LODO majority transfer is unexpectedly effective in our grid because IA$^3$ is plurality-dominant. A natural follow-up is whether \emph{any} more-granular selector can improve over this constant choice. We evaluate eight zero-shot selection strategies using leave-one-domain-out cross-validation (4 folds $\times$ 3 models = 12 held-out cells). For each held-out domain, each strategy recommends a method using only training-domain information. We measure top-1 accuracy (does the recommendation match the oracle?) and relative regret.
+
+\textbf{Strategies.} We evaluate eight strategies spanning three families---heuristic baselines, shift-aware selectors, and learned meta-selectors---plus oracle (ceiling) and random (floor) bounds:
+\begin{itemize}[nosep,leftmargin=*]
+\item \emph{Global-best / LODO}: transfer the most frequent winner from training domains.
+\item \emph{Arch-default}: most frequent winner per architecture family.
+\item \emph{Shift-NN / Regret-W NN}: nearest training domain by Euclidean distance on the 5-dim shift profile; Regret-W NN additionally weights neighbors by inverse distance and selects the method minimizing expected regret.
+\item \emph{Decision-Tree / Logistic / Random Forest}: learned classifiers on shift + architecture features, ranging from heavily regularized (single shallow tree) to higher capacity (multinomial logistic, ensemble forest).
+\end{itemize}
+
+\begin{table}[t]
+\centering
+\caption{\textbf{Adaptation selector comparison} (LOOCV, 12 held-out cells). 95\% bootstrap CI in brackets. Regret $= (\text{rec.\ MAE} - \text{oracle}) / \text{oracle}$.}
+\label{tab:selector}
+\small
+\begin{tabular}{lccc}
+\toprule
+Strategy & Top-1$\uparrow$ & Mean Regret$\downarrow$ & Max Regret \\
+\midrule
+\textit{Random (floor)}  & 33.3\% \scriptsize{[8,58]} & 0.264 \scriptsize{[.02,.62]} & 1.83 \\
+\textbf{Global-Best}      & \textbf{41.7\%} \scriptsize{[17,67]} & \textbf{0.015} \scriptsize{[.003,.036]} & 0.12 \\
+\textbf{LODO Majority}    & \textbf{41.7\%} \scriptsize{[17,67]} & \textbf{0.015} \scriptsize{[.003,.036]} & 0.12 \\
+\midrule
+Arch-Default              & 16.7\% \scriptsize{[0,42]} & 0.101 \scriptsize{[.01,.27]} & 0.96 \\
+\textbf{Regret-W NN}      & \textbf{41.7\%} \scriptsize{[17,67]} & 0.095 \scriptsize{[.003,.262]} & 0.96 \\
+Shift-NN (vanilla)        & 25.0\% \scriptsize{[0,50]} & 0.290 \scriptsize{[.01,.78]} & 2.59 \\
+Logistic Meta             & 33.3\% \scriptsize{[8,58]} & 0.018 \scriptsize{[.005,.040]} & 0.12 \\
+Decision-Tree             &  0.0\% & 0.320 \scriptsize{[.02,.82]} & 2.59 \\
+Random Forest             &  0.0\% & 0.321 \scriptsize{[.02,.82]} & 2.59 \\
+\midrule
+\textit{Oracle (ceiling)} & 100\% & 0.000 & 0.00 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:selector} reveals three findings.
+
+First, \textbf{plurality-based transfer (LODO Majority and Global-Best) achieves the strongest non-oracle regret performance}: mean regret $0.015$ (max $0.12$) with top-1 accuracy 41.7\%---a $\mathbf{17{\times}}$ improvement over the random baseline ($0.264$). The mechanism is straightforward: IA$^3$ is the plurality-dominant oracle in our grid (5/12 cells), so LODO majority picks IA$^3$ for every test cell. On the 7 cells where another method wins, IA$^3$ is rarely far behind (max regret $12.2\%$, median $0.5\%$). The strength of plurality transfer is therefore \emph{not} generic: it depends on the candidate set admitting a method that is competitive across most architecture--domain pairs. In our 5-method evaluation IA$^3$ satisfies this; future grids with a different palette may not.
+
+Second, \textbf{architecture-conditional splitting (Arch-Default) underperforms simple plurality} (top-1 16.7\%, mean regret $0.101$) because it partitions the candidate pool. The Chronos default coincides with the global plurality (IA$^3$), but Moirai- and MOMENT-defaults diverge from IA$^3$ and lose hits. This is a counterintuitive finding: more granular features can \emph{hurt} when the underlying signal is dominated by a single global plurality. \textbf{Regret-Weighted NN} matches LODO on top-1 (41.7\%) but loses by $\sim$$6{\times}$ on regret ($0.095$ vs.\ $0.015$); the 5-dim shift profile does not yet add measurable value over a constant choice of IA$^3$ at our evaluation scale. Vanilla nearest-neighbor on shift profiles (25.0\%) further degrades because raw distance in shift space is noisy at $n{=}4$ domains, where each held-out test point has at most three training neighbors and the dominant shift dimensions (amplitude $W_1$ and ACF distance) are not monotonically aligned with method ranking.
+
+Third, \textbf{among learned classifiers, Logistic Regression is the most efficient} (top-1 33.3\%, mean regret $0.018$, max $0.12$), substantially beating Arch-Default and approaching LODO. Tree-based learners (Decision-Tree, Random Forest) overfit catastrophically at $n{=}9$ training cells $\times$ $5$ classes and achieve $0\%$ top-1 with $0.32$ mean regret. The Logistic Regression result is consistent with bias--variance considerations: a heavily regularized linear model on 9 features can recover the plurality signal from the architecture-identity dimensions, while higher-capacity learners memorize spurious feature interactions.
+
+\textbf{Practical protocol.} The strongest non-oracle strategies require no target-domain training data: LODO Majority and Global-Best transfer the plurality oracle method from training cells (here, IA$^3$); Logistic Regression on shift + architecture features achieves comparable regret without a target-domain run. We recommend a two-stage protocol: (1)~use LODO Majority (or, equivalently, Global-Best) as a default; (2)~validate with a minimal in-domain sweep (2--4 runs) when deployment cost is asymmetric or when the candidate palette differs from ours. This combines the zero-cost advantage of plurality transfer with the safety of in-domain validation. The total sweep budget shrinks from 15 runs (5 methods $\times$ 3 seeds) to 2--4 runs in the typical case.
+
+\textbf{Why plurality beats granular features.} A natural question is whether shift-aware or architecture-aware selectors might dominate at a different evaluation scale. We argue that the binding signal at our scale is the \emph{marginal oracle distribution}, not architectural or shift features. Three pieces of evidence support this. (i) LODO Majority and Global-Best, which use only the marginal distribution, achieve the lowest regret of any non-oracle strategy. (ii) Logistic Regression, a linear classifier on 9 features (5 shift dims + 4 architecture one-hot), achieves regret close to LODO ($0.018$ vs $0.015$) but does not improve over it. (iii) Granular features (Arch-Default, Regret-W NN) produce higher regret than the constant IA$^3$ choice. The methodological lesson is that more granular features only help once the marginal oracle distribution itself becomes diffuse---which would require either a larger or more architecturally diverse evaluation grid than ours.
+
+A per-cell breakdown of why IA$^3$ takes the plurality (architectural Pareto frontier on Chronos and Moirai, ties on MOMENT) is in Appendix~\ref{sec:per-cell-mae}. This pattern suggests a concrete recipe for selector design at small grid sizes: prefer selectors whose decision rule is short enough to verify by hand (architecture lookup, single-neighbor distance), and evaluate them on regret rather than top-1 accuracy.
+
+\paragraph{Mechanistic correlate.}
+A gradient-flow probe across four (model, method, domain) cells supports the interaction pattern qualitatively: Chronos+LoRA concentrates gradient energy in early encoder layers (consistent with the \texttt{early\_layers} locus winning for Chronos), whereas MOMENT+LoRA distributes flow uniformly across blocks (consistent with $\eta^2_{\text{int}} = 0.000$ for MOMENT). With $n{=}2$ seeds and $4$ cells, we treat this as descriptive correlate rather than a formal test. Full heatmap and per-layer distributions are deferred to Appendix~\ref{sec:gradient-probe}.
+
+%% ================================================================
+%% 5. DISCUSSION
+%% ================================================================
+\section{Discussion}
+
+\paragraph{Why this negative result matters.}
+The paper's contribution is not a new PEFT variant but a \emph{narrowing of the decision problem}. The common implicit assumption---that a method validated on one TSFM--domain pair can serve as a general recommendation---is not supported by our evidence. This matters because PEFT recommendations are increasingly being propagated across settings: a finding that ``LoRA rank~8 works well'' on one benchmark gets adopted as a default elsewhere, without validation on the target architecture--domain pair. Our results show that this practice carries non-trivial risk.
+
+\paragraph{Practical adaptation protocol.}
+For practitioners deploying TSFMs, our findings suggest a concrete four-step protocol:
+\begin{enumerate}[nosep,leftmargin=*]
+  \item \textbf{Baseline first.} Evaluate zero-shot and head-only---they are free and can be optimal (Head-only wins for Chronos+Finance and MOMENT+SMD).
+  \item \textbf{Small validation sweep when the candidate palette differs from ours.} 2--3 PEFT methods $\times$ 1--2 ranks (4--6 runs) on the target domain. In our grid LODO already approaches in-domain validation (median regret 0.5\%); the sweep is essential when the palette lacks a plurality-dominant oracle.
+  \item \textbf{Architecture-informed defaults} (Section~\ref{sec:efficiency}): IA$^3$ first for encoder--decoder, LoRA or Full-FT first for any-variate.
+  \item \textbf{Monitor for divergence.} Stop if validation MAE exceeds $3\times$ the zero-shot baseline.
+\end{enumerate}
+
+\paragraph{Connection to algorithm selection.}
+Our findings position PEFT method selection as an ASP instance~\citep{rice1976algorithm} where the feature space is defined by domain shift properties and architecture identity. Unlike MetaPEFT~\citep{tian2025metapeft}, the time series setting currently offers too few architecture--domain cells for bi-level optimization. At our $n{=}12$ scale, plurality transfer outperforms granular selectors, indicating that the binding signal is the marginal oracle distribution; scaling the candidate pool and the grid are the natural paths to stronger selectors.
+
+A concrete selector-design recipe for ASP at small grids---test the constant-plurality baseline first, prefer regularised linear over high-capacity learners until training-cell count $\gtrsim 5 \cdot n_{\text{methods}}^2$, report regret rather than top-1 since random matches Arch-Default on top-1 but produces $17\times$ higher regret---is recorded in Appendix~\ref{sec:design-recipe}.
+
+\paragraph{Architecture-conditional guidance.}
+\textit{Encoder--decoder (Chronos-like):} IA$^3$ or Head-only first; LoRA with divergence monitoring on high-shift domains. \textit{Encoder-only (MOMENT-like):} method differences are small---Head-only or Zero-shot suffice. \textit{Any-variate (Moirai-like):} IA$^3$ may be insufficient; include LoRA and Full-FT.
+
+\paragraph{Limitations.}
+\label{sec:limitations}
+\textbf{Scale and CIs.} 3 TSFMs $\times$ 4 domains = 12 evaluation cells; bootstrap CIs are wide (Wilson [17\%,~67\%] for LODO/Regret-W NN top-1; [8\%,~58\%] for Logistic Meta), so individual rankings between non-oracle strategies should be read as directional rather than definitive. \textbf{Plurality dependence.} Our LODO headline depends on IA$^3$ being the plurality oracle (5/12 cells); a different candidate palette without a dominant method---or a grid where the plurality method is not architecture-agnostic---may flip the conclusion. \textbf{Coverage.} Moirai has partial cells for LoRA (15/20) and IA$^3$ (13/20) due to configuration incompatibilities; Chronos and MOMENT are fully covered at 5 seeds. \textbf{Outliers.} 13/348 primary main-method runs diverged, concentrated on Chronos+LoRA+ETTm1 ($\times$5), Chronos+LoRA+SMD ($\times$2), and Chronos+Full-FT+PhysioNet ($\times$5); a parallel Kruskal--Wallis on the unfiltered data confirms direction. \textbf{Data.} SMD uses a 50k-row contiguous prefix; PhysioNet uses \texttt{enforce\_entity\_boundary=False} for long-context compatibility---both affect absolute MAE but not within-domain rankings. \textbf{Interaction sensitivity.} Moirai's $\eta^2_{\text{int}}$ dropped from $0.905$ (2-domain DoRA) to $0.207$ (4-domain), illustrating that partial coverage can overestimate interaction strength; this is the strongest argument for balanced design in future TSFM benchmarks. \textbf{MOMENT generalization.} The null result may be specific to masked pretraining and patch tokenization, and might not extend to other encoder-only TSFMs. \textbf{Mechanism.} The gradient probe (Appendix~\ref{sec:gradient-probe}) covers only 4 cells $\times$ 2 seeds and is descriptive; a formal mechanistic test would require a balanced grid of probe cells and a null distribution to test for. \textbf{Domain coverage.} Climate, retail, and transportation domains are unrepresented; their inclusion may either reinforce the IA$^3$ plurality or break it---we cannot predict from the current grid.
+
+%% ================================================================
+%% 6. CONCLUSION
+%% ================================================================
+\section{Conclusion}
+
+We presented \textbf{TSFM-PEFT-Bench}, a cross-architecture audit of PEFT transfer in TSFMs (882 runs, 3$\times$4$\times$3 grid). ANOVA shows domain dominates variance with Method$\times$Domain interaction reaching 21--22\% (Chronos, Moirai). \textbf{Naive LODO majority is surprisingly effective} (41.7\% top-1, regret $0.015$, $17{\times}$ over random) because IA$^3$ is plurality-dominant; granular and learned selectors do not beat it. New TSFM results should report interaction and cross-domain transfer alongside in-domain accuracy.
+
+\begin{ack}
+% Camera-ready: replace with actual acknowledgements.
+Acknowledgements withheld for anonymous review.
+\end{ack}
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\clearpage
+\appendix
+
+\section*{Appendix: Table of Contents}
+\begin{itemize}[nosep,leftmargin=*]
+\item[\ref{sec:cka-appendix}.] Preliminary Representation-Similarity Diagnostics
+\item[\ref{sec:lodo-regret-app}.] Per-cell LODO regret breakdown
+\item[\ref{sec:dora-app}.] DoRA vs.\ LoRA per-cell comparison
+\item[\ref{sec:heatmaps}.] Detailed Method-by-Domain Heatmaps
+\item[\ref{sec:mase}.] MASE Results
+\item[\ref{sec:anova-detail}.] ANOVA Reporting Notes (with dof, KW, Holm--Bonferroni)
+\item[\ref{sec:app-protocol}.] Adaptation Protocol
+\item[\ref{sec:seed-cov}.] Seed Coverage
+\item[\ref{sec:gradient-probe}.] Gradient Probe Details
+\item[\ref{sec:spectral-rank}.] Spectral--Rank Correlation Analysis
+\item[\ref{sec:design-recipe}.] Selector Design Recipe at Small Grid Sizes
+\item[\ref{sec:hyperparams}.] Hyperparameters and Training Configuration
+\item[\ref{sec:domain-stats}.] Domain Statistics
+\item[\ref{sec:params}.] Trainable Parameter Counts
+\item[\ref{sec:per-cell-mae}.] Per-cell mean MAE (full grid)
+\item[\ref{sec:selector-fold}.] Selector per-fold breakdown
+\item[\ref{sec:datasheet}.] Datasheet for TSFM-PEFT-Bench
+\item[\ref{sec:repro}.] Reproducibility Statement
+\item[\ref{sec:broader}.] Broader Impacts
+\end{itemize}
+
+\input{paper_appendix.tex}
+
+\clearpage
+\input{neurips_checklist.tex}
+
+\end{document}

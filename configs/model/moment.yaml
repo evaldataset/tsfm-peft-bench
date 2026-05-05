@@ -1,0 +1,8 @@
+name: moment
+hf_id: "AutonLab/MOMENT-1-large"
+architecture: t5_encoder
+num_layers: 24
+hidden_size: 1024
+context_length: 512
+prediction_length: 96
+freeze_encoder: false

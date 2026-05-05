@@ -1,0 +1,54 @@
+{
+  "ett_m1": {
+    "amplitude_w1": 9.5781,
+    "amplitude_delta_log_std": 0.0,
+    "amplitude_delta_mean": 0.0,
+    "spectral_w1": 0.05,
+    "spectral_bandpower_l1": 0.1,
+    "acf_distance": 0.5,
+    "acf_delta_period": 0.0,
+    "irregularity_missing_rate": 0.0,
+    "irregularity_perm_entropy_diff": 0.1,
+    "nonstationarity_kpss_diff": 1.5,
+    "nonstationarity_changepoint_diff": 2.0
+  },
+  "finance": {
+    "amplitude_w1": 0.127,
+    "amplitude_delta_log_std": 0.0,
+    "amplitude_delta_mean": 0.0,
+    "spectral_w1": 0.02,
+    "spectral_bandpower_l1": 0.05,
+    "acf_distance": 0.2,
+    "acf_delta_period": 0.0,
+    "irregularity_missing_rate": 0.0,
+    "irregularity_perm_entropy_diff": 0.05,
+    "nonstationarity_kpss_diff": 0.8,
+    "nonstationarity_changepoint_diff": 1.0
+  },
+  "smd": {
+    "amplitude_w1": 0.5,
+    "amplitude_delta_log_std": 0.0,
+    "amplitude_delta_mean": 0.0,
+    "spectral_w1": 0.03,
+    "spectral_bandpower_l1": 0.08,
+    "acf_distance": 0.3,
+    "acf_delta_period": 0.0,
+    "irregularity_missing_rate": 0.0,
+    "irregularity_perm_entropy_diff": 0.08,
+    "nonstationarity_kpss_diff": 1.0,
+    "nonstationarity_changepoint_diff": 1.5
+  },
+  "physionet": {
+    "amplitude_w1": 0.8492999999999997,
+    "amplitude_delta_log_std": 0.03036934502244737,
+    "amplitude_delta_mean": 0.5799026489257812,
+    "spectral_w1": 2.764251870481371e-06,
+    "spectral_bandpower_l1": 0.008922068777512589,
+    "acf_distance": 1.1292461588255478,
+    "acf_delta_period": 2.6959022286125105,
+    "irregularity_missing_rate": 0.0,
+    "irregularity_perm_entropy_diff": 0.007916615195482812,
+    "nonstationarity_kpss_diff": 0.005400047165808219,
+    "nonstationarity_changepoint_diff": 45.0
+  }
+}

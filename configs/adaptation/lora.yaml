@@ -1,0 +1,8 @@
+name: lora
+method: lora
+rank: 8
+alpha: 16
+dropout: 0.05
+target_modules: ["q", "k", "v", "o"]
+locus: "attn_all"  # attn_qv, attn_all, ffn, attn_qv_ffn, early_layers, late_layers
+layers: "all"  # all, early, late

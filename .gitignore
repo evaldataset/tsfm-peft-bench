@@ -1,0 +1,60 @@
+# Data
+data/
+*.csv
+*.parquet
+
+# Raw run outputs (heavy; available via Hugging Face dataset)
+results/expansion/
+results/cluster_logs/
+results/wandb/
+checkpoints/
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.bin
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.eggs/
+.venv/
+venv/
+
+# Environment
+.env
+*.env
+
+# IDE / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Logs
+logs/
+wandb/
+cluster_logs/
+
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
+
+# Internal planning (not in submission)
+.sisyphus/
+.omc/
+.claude/
+
+# Agent/IDE state
+SUBMISSION_INTERNAL/

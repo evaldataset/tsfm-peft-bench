@@ -1,0 +1,10 @@
+name: timesfm
+hf_id: "google/timesfm-1.0-200m-pytorch"
+architecture: decoder_only
+num_layers: 20
+hidden_size: 1280
+context_length: 512
+prediction_length: 128
+backend: "gpu"
+freq: 0
+per_core_batch_size: 32

@@ -1,0 +1,4 @@
+name: adapter
+method: adapter
+bottleneck_size: 64
+task_type: SEQ_2_SEQ_LM

@@ -1,0 +1,29 @@
+defaults:
+  - model: chronos
+  - adaptation: lora
+  - data: ett_m1
+  - _self_
+
+seed: 42
+training:
+  epochs: 50
+  batch_size: 32
+  lr: 1e-4
+  weight_decay: 0.01
+  warmup_steps: 100
+  fp16: true
+  gradient_accumulation_steps: 1
+  max_grad_norm: 1.0
+  early_stopping_patience: 10
+
+logging:
+  wandb_project: "tsfm-peft"
+  wandb_entity: null
+  log_every_n_steps: 10
+  save_best_only: true
+
+evaluation:
+  metrics: ["mae", "mse", "mase"]
+  seeds: [42, 123, 7, 2024, 3407]
+
+output_dir: results/${model.name}_${adaptation.name}_${data.name}

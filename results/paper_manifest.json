@@ -1,0 +1,100 @@
+{
+  "description": "Single source-of-truth experiment manifest (reproduce_paper_tables.py 출력).",
+  "inclusion_criteria": {
+    "primary_models": [
+      "chronos",
+      "moirai",
+      "moment"
+    ],
+    "descriptive_only_models": [
+      "timesfm"
+    ],
+    "main_methods": [
+      "zero_shot",
+      "head_only",
+      "lora",
+      "dora",
+      "ia3",
+      "adapter",
+      "full_fine_tuning"
+    ],
+    "descriptive_only_methods": [
+      "prefix"
+    ],
+    "outlier_rule": "MAE > 10 x same-(model,domain) zero-shot median"
+  },
+  "counts": {
+    "domain": {
+      "all_runs": 398,
+      "timesfm_descriptive": 30,
+      "primary_included": 368,
+      "primary_main_methods": 348,
+      "primary_prefix_descriptive": 20,
+      "primary_main_outliers": 13,
+      "primary_main_kept": 335,
+      "per_model_primary_included": {
+        "chronos": 140,
+        "moirai": 108,
+        "moment": 120
+      },
+      "per_model_main_kept": {
+        "chronos": 107,
+        "moirai": 108,
+        "moment": 120
+      },
+      "per_model_main_outliers": {
+        "chronos": 13
+      }
+    },
+    "rank": {
+      "all_runs": 238,
+      "timesfm_descriptive": 24,
+      "primary_included": 214,
+      "primary_main_methods": 214,
+      "primary_prefix_descriptive": 0,
+      "primary_main_outliers": 6,
+      "primary_main_kept": 208,
+      "per_model_primary_included": {
+        "chronos": 60,
+        "moirai": 75,
+        "moment": 79
+      },
+      "per_model_main_kept": {
+        "chronos": 54,
+        "moirai": 75,
+        "moment": 79
+      },
+      "per_model_main_outliers": {
+        "chronos": 6
+      }
+    },
+    "locus": {
+      "all_runs": 336,
+      "timesfm_descriptive": 36,
+      "primary_included": 300,
+      "primary_main_methods": 300,
+      "primary_prefix_descriptive": 0,
+      "primary_main_outliers": 9,
+      "primary_main_kept": 291,
+      "per_model_primary_included": {
+        "chronos": 90,
+        "moirai": 90,
+        "moment": 120
+      },
+      "per_model_main_kept": {
+        "chronos": 81,
+        "moirai": 90,
+        "moment": 120
+      },
+      "per_model_main_outliers": {
+        "chronos": 9
+      }
+    }
+  },
+  "totals": {
+    "paper_included_primary_runs": 882,
+    "primary_main_method_runs": 862,
+    "primary_main_kept_after_outliers": 834,
+    "primary_main_outliers": 28
+  }
+}

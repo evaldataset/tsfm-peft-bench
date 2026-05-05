@@ -1,0 +1,61 @@
+\documentclass{article}
+
+\newif\ifcameraready
+\ifdefined\camerareadyflag
+  \camerareadytrue
+\else
+  \camerareadyfalse
+\fi
+
+\PassOptionsToPackage{numbers,compress}{natbib}
+\ifcameraready
+  \usepackage[main,final]{neurips_2026}
+\else
+  \usepackage[main]{neurips_2026}
+\fi
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{enumitem}
+\usepackage{nicefrac}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{xcolor}
+\usepackage{multirow}
+
+\graphicspath{{results/expansion_analysis/}}
+
+\title{Selective Plasticity or Diffuse Drift?\\
+Why PEFT Transfers Conditionally in Time Series Foundation Models\\
+--- Supplementary Material ---}
+\author{%
+First Author \\
+Department or Lab \\
+Institution \\
+City, Country \\
+\texttt{first.author@example.com} \\
+\And
+Second Author \\
+Department or Lab \\
+Institution \\
+City, Country \\
+\texttt{second.author@example.com}
+}
+
+\begin{document}
+\maketitle
+
+This supplementary material provides additional figures, tables, and supporting notes for the submission.
+
+\input{paper_appendix.tex}
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}

@@ -1,0 +1,320 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "dct": "http://purl.org/dc/terms/",
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileProperty": "cr:fileProperty",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "jsonPath": "cr:jsonPath",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "sc": "https://schema.org/",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "name": "TSFM-PEFT-Bench",
+  "description": "TSFM-PEFT-Bench is a cross-architecture benchmark for evaluating Parameter-Efficient Fine-Tuning (PEFT) recommendation reliability in Time Series Foundation Models (TSFMs). It contains 882 paper-included primary-model runs spanning 3 TSFMs (Chronos, MOMENT, Moirai) x 4 domains (ETTm1, Finance/exchange_rate, SMD, PhysioNet 2012) x 6 PEFT methods (zero_shot, head_only, LoRA, DoRA, IA^3, Full-FT) plus rank and locus sweeps, with an additional 90 TimesFM descriptive runs (972 runs total). Each record includes seed-level MAE/MSE/MASE metrics, trainable/total parameter counts, training wall-clock, and config metadata, enabling reproduction of the per-architecture two-way ANOVA, leave-one-domain-out (LODO) selector evaluation, and per-cell efficiency analysis reported in the paper.",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "license": "https://www.apache.org/licenses/LICENSE-2.0",
+  "url": "https://anonymous.4open.science/r/tsfm-peft-bench-anon",
+  "version": "1.0.0",
+  "datePublished": "2026-05-06",
+  "keywords": [
+    "time series",
+    "foundation model",
+    "PEFT",
+    "LoRA",
+    "DoRA",
+    "IA3",
+    "adapter",
+    "benchmark",
+    "evaluation",
+    "algorithm selection",
+    "domain shift"
+  ],
+  "creator": {
+    "@type": "Organization",
+    "name": "Anonymous (under double-blind review at NeurIPS 2026 D&B Track)"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Anonymous (under double-blind review at NeurIPS 2026 D&B Track)"
+  },
+  "citeAs": "Anonymous. TSFM-PEFT-Bench: A Cross-Architecture Benchmark for PEFT Selection in Time Series Foundation Models. Under review at NeurIPS 2026 Datasets and Benchmarks Track, 2026.",
+
+  "rai:dataCollection": "Each record is the output of a single training-and-evaluation run executed via scripts/run_expansion.py against a fixed Hydra YAML config tree. Pre-trained TSFM checkpoints are loaded from the public Hugging Face Hub (amazon/chronos-t5-base, AutonLab/MOMENT-1-large, Salesforce/moirai-1.1-R-base, google/timesfm-1.0-200m). Source domain CSVs are publicly available (ETT-small, exchange_rate, SMD, PhysioNet 2012). All training was performed on internal compute (4x RTX 3090 + 40x RTX 3060 cluster nodes) over approximately 2,250 GPU-hours.",
+  "rai:dataPreprocessing": "Per-domain context/horizon and split ratios documented in configs/data/*.yaml: ETTm1 60/20/20 chronological, Finance 70/10/20, SMD per-machine concatenation with NaN-sentinel boundaries (val 20% from train tail), PhysioNet 70/15/15 patient-level split with patient identity preserved across splits. SMD is truncated to a 50,000-row contiguous prefix after machine concatenation. PhysioNet long-context DoRA runs use enforce_entity_boundary=False (relaxed window concatenation across patient boundaries while preserving labels). Outlier filter for analysis: per-cell scale-aware (MAE > 10x same-(model,domain) zero-shot baseline) excludes 13/348 primary main-method domain-mode runs.",
+  "rai:dataAnnotationProtocol": "Records are deterministic outputs of the training pipeline; no human annotation. Each (model, method, domain, seed) combination is a single run. Reproducibility is supported by Hydra-frozen configs, requirements-lock.txt, and python scripts/reproduce_paper_tables.py (regenerates the paper's headline numbers end-to-end).",
+  "rai:dataAnnotationDemographics": "Not applicable: no human-subject annotation. PhysioNet 2012 includes ICU patient demographics (age, sex) used downstream by the underlying dataset but not by our forecasting evaluation, which uses heart-rate (HR) only.",
+  "rai:dataAnnotationsPerItem": "1 (each run is annotated with metrics, config, and parameter counts by the training script).",
+  "rai:dataReleaseMaintenancePlan": "Public repository hosted on Hugging Face Datasets (and mirrored on Anonymous-4-Open-Science during review). Versioned releases via git tags. Bug reports and rerun requests via the repository issue tracker. Authors commit to maintaining the dataset at least until NeurIPS 2027 main meeting.",
+  "rai:dataLimitation": [
+    "Evaluation grid is 12 cells (3 architectures x 4 domains); bootstrap CIs on selector top-1 are wide (Wilson [17%, 67%]).",
+    "Plurality dependence: the headline LODO Majority result depends on IA^3 being the plurality oracle (5/12 cells); a different candidate palette without a dominant method may flip selector rankings.",
+    "Coverage is uneven for Moirai: LoRA at 15/20 and IA^3 at 13/20 due to configuration incompatibilities; Chronos and MOMENT have full 5-seed coverage.",
+    "13/348 primary main-method runs diverged (Chronos+LoRA+ETTm1 x5, Chronos+LoRA+SMD x2, Chronos+Full-FT+PhysioNet x5, Chronos+DoRA+ETTm1 x1) and are excluded from filtered analyses.",
+    "MASE is computed for only 101/288 (35%) primary-model runs; MAE is the primary endpoint.",
+    "TimesFM (90 runs) is included descriptively only and excluded from inferential analyses due to limited coverage and a paxml/lingvo dependency conflict that prevents extension.",
+    "The MOMENT null result (eta_meth approx 0) may be specific to MOMENT's masked pretraining + patch tokenization combination and may not generalize to other encoder-only TSFMs.",
+    "Climate, retail, and transportation domains are unrepresented; their inclusion may reinforce or break the IA^3 plurality.",
+    "Gradient probe in Section 4.7 covers only 4 cells x 2 seeds and is qualitative."
+  ],
+  "rai:personalSensitiveInformation": "PhysioNet 2012 contains de-identified ICU patient time series (heart rate). The original PhysioNet release follows HIPAA-compliant de-identification per the PhysioNet/Computing in Cardiology Challenge 2012 protocol. We use only the HR target column at hourly resolution and do not redistribute raw patient records; the benchmark records expose only forecasting metrics computed downstream. ETTm1 (oil temperature), Finance (currency exchange rates), and SMD (industrial machine sensors) contain no human-subject data.",
+  "rai:dataBiases": [
+    "Domain selection bias: 4 hand-picked domains chosen to span shift profile dimensions, not as a representative sample of all time-series application areas.",
+    "Architecture selection bias: 3 publicly available TSFMs that admit all considered PEFT methods; closed-source or restrictively licensed models (e.g., Lag-Llama variants) are not represented.",
+    "Method selection bias: 5 main PEFT methods + DoRA + descriptive Prefix; FourierFT, BitFit, and other recent variants are not evaluated.",
+    "Plurality of IA^3 in the oracle distribution drives the headline LODO Majority result; other candidate palettes might dominate differently.",
+    "Per-domain sample sizes differ (ETTm1 ~70k timesteps vs PhysioNet ~hourly per patient), and absolute MAE is therefore not comparable across domains; we report effect sizes and rank-based metrics."
+  ],
+  "rai:dataUseCases": "The benchmark is designed for: (1) reproducing and auditing PEFT-recommendation reliability claims across TSFM architectures; (2) developing and evaluating selector strategies for PEFT method recommendation under domain shift; (3) studying methodological pitfalls in cross-domain evaluation (interaction effect coverage sensitivity, plurality dependence); (4) downstream meta-learning research at small evaluation grids; (5) educational use as an example of cross-architecture empirical audit.",
+  "rai:dataSocialImpact": "Positive impacts include reducing wasted compute from brittle adaptation choices and improving robustness in high-stakes TSFM deployments (healthcare, energy, industrial monitoring). Negative impacts include overconfidence in plurality-based transfer if practitioners apply our LODO heuristic outside its evaluated scope, and potential misuse of anomaly detection models in surveillance contexts without appropriate human oversight. We recommend domain-specific validation before deployment and transparent reporting of adaptation failures.",
+  "rai:dataLimitations": "See rai:dataLimitation above (multi-valued).",
+
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "paper-manifest",
+      "name": "paper_manifest.json",
+      "description": "Single source-of-truth manifest enumerating the 882 paper-included primary-model runs with inclusion criteria, per-mode counts, and per-architecture breakdowns. Regenerated by scripts/reproduce_paper_tables.py.",
+      "contentUrl": "https://anonymous.4open.science/r/tsfm-peft-bench-anon/results/paper_manifest.json",
+      "encodingFormat": "application/json",
+      "sha256": "regenerate-on-release"
+    },
+    {
+      "@type": "cr:FileObject",
+      "@id": "paper-numbers-json",
+      "name": "paper_numbers.json",
+      "description": "Headline numerical claims of the paper (totals, per-architecture ANOVA F/eta-squared, etc.).",
+      "contentUrl": "https://anonymous.4open.science/r/tsfm-peft-bench-anon/results/paper_numbers.json",
+      "encodingFormat": "application/json"
+    },
+    {
+      "@type": "cr:FileObject",
+      "@id": "selector-evaluation",
+      "name": "selector_evaluation.json",
+      "description": "LOOCV selector evaluation: 8 strategies + 2 bounds (Random, Oracle), top-1 / mean regret / max regret with bootstrap 95% CIs.",
+      "contentUrl": "https://anonymous.4open.science/r/tsfm-peft-bench-anon/results/selector_evaluation.json",
+      "encodingFormat": "application/json"
+    },
+    {
+      "@type": "cr:FileObject",
+      "@id": "shift-profiles",
+      "name": "domain_shift_profiles.json",
+      "description": "5-dimensional distribution shift profile (amplitude_w1, spectral_w1, acf_distance, nonstationarity_kpss_diff, irregularity_perm_entropy_diff) per domain, used as input features for shift-aware selectors.",
+      "contentUrl": "https://anonymous.4open.science/r/tsfm-peft-bench-anon/results/expansion_analysis_v2/domain_shift_profiles.json",
+      "encodingFormat": "application/json"
+    },
+    {
+      "@type": "cr:FileSet",
+      "@id": "domain-runs",
+      "name": "domain-mode runs",
+      "description": "398 per-run JSON files for the (model, method, domain, seed) primary grid (domain mode).",
+      "encodingFormat": "application/json",
+      "includes": "results/expansion/domain/*.json"
+    },
+    {
+      "@type": "cr:FileSet",
+      "@id": "rank-runs",
+      "name": "rank-mode runs",
+      "description": "238 per-run JSON files for the LoRA rank sweep across {4, 8, 16, 32}.",
+      "encodingFormat": "application/json",
+      "includes": "results/expansion/rank/*.json"
+    },
+    {
+      "@type": "cr:FileSet",
+      "@id": "locus-runs",
+      "name": "locus-mode runs",
+      "description": "336 per-run JSON files for the LoRA locus sweep across 6 insertion points.",
+      "encodingFormat": "application/json",
+      "includes": "results/expansion/locus/*.json"
+    }
+  ],
+
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "@id": "run-records",
+      "name": "run-records",
+      "description": "Per-run records: one record per (model, method, domain, seed [, rank, locus]) combination.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "run-records/experiment_id",
+          "name": "experiment_id",
+          "description": "Unique identifier for the run, e.g., chronos_lora_ett_m1_seed42.",
+          "dataType": "sc:Text",
+          "source": {
+            "fileSet": {"@id": "domain-runs"},
+            "extract": {"jsonPath": "$.experiment_id"}
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "run-records/model",
+          "name": "model",
+          "description": "TSFM architecture: chronos | moment | moirai | timesfm.",
+          "dataType": "sc:Text",
+          "source": {
+            "fileSet": {"@id": "domain-runs"},
+            "extract": {"jsonPath": "$.model"}
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "run-records/method",
+          "name": "method",
+          "description": "PEFT method: zero_shot | head_only | lora | dora | adapter (IA^3) | full_fine_tuning | prefix.",
+          "dataType": "sc:Text",
+          "source": {
+            "fileSet": {"@id": "domain-runs"},
+            "extract": {"jsonPath": "$.method"}
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "run-records/domain",
+          "name": "domain",
+          "description": "Evaluation domain: ett_m1 | finance | smd | physionet.",
+          "dataType": "sc:Text",
+          "source": {
+            "fileSet": {"@id": "domain-runs"},
+            "extract": {"jsonPath": "$.domain"}
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "run-records/seed",
+          "name": "seed",
+          "description": "Random seed: typically one of {42, 123, 7, 2024, 3407}.",
+          "dataType": "sc:Integer",
+          "source": {
+            "fileSet": {"@id": "domain-runs"},
+            "extract": {"jsonPath": "$.seed"}
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "run-records/rank",
+          "name": "rank",
+          "description": "LoRA/DoRA rank (typically 8; sweep values {4, 8, 16, 32}).",
+          "dataType": "sc:Integer",
+          "source": {
+            "fileSet": {"@id": "domain-runs"},
+            "extract": {"jsonPath": "$.rank"}
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "run-records/locus",
+          "name": "locus",
+          "description": "LoRA insertion locus: attn_qv | attn_all | ffn | attn_qv_ffn | early_layers | late_layers.",
+          "dataType": "sc:Text",
+          "source": {
+            "fileSet": {"@id": "domain-runs"},
+            "extract": {"jsonPath": "$.locus"}
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "run-records/mae",
+          "name": "mae",
+          "description": "Test-set Mean Absolute Error (primary endpoint).",
+          "dataType": "sc:Float",
+          "source": {
+            "fileSet": {"@id": "domain-runs"},
+            "extract": {"jsonPath": "$.metrics.mae"}
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "run-records/mse",
+          "name": "mse",
+          "description": "Test-set Mean Squared Error.",
+          "dataType": "sc:Float",
+          "source": {
+            "fileSet": {"@id": "domain-runs"},
+            "extract": {"jsonPath": "$.metrics.mse"}
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "run-records/mase",
+          "name": "mase",
+          "description": "Test-set Mean Absolute Scaled Error (35% coverage; MAE-consistent where available).",
+          "dataType": "sc:Float",
+          "source": {
+            "fileSet": {"@id": "domain-runs"},
+            "extract": {"jsonPath": "$.metrics.mase"}
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "run-records/trainable_params",
+          "name": "trainable_params",
+          "description": "Number of trainable parameters introduced by the adaptation method.",
+          "dataType": "sc:Integer",
+          "source": {
+            "fileSet": {"@id": "domain-runs"},
+            "extract": {"jsonPath": "$.trainable_params"}
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "run-records/total_params",
+          "name": "total_params",
+          "description": "Total parameter count of the adapted model (backbone + adaptation).",
+          "dataType": "sc:Integer",
+          "source": {
+            "fileSet": {"@id": "domain-runs"},
+            "extract": {"jsonPath": "$.total_params"}
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "run-records/train_time_seconds",
+          "name": "train_time_seconds",
+          "description": "Wall-clock training time including data loading, training, and evaluation.",
+          "dataType": "sc:Float",
+          "source": {
+            "fileSet": {"@id": "domain-runs"},
+            "extract": {"jsonPath": "$.train_time_seconds"}
+          }
+        }
+      ]
+    }
+  ]
+}

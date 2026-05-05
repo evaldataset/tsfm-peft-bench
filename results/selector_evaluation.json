@@ -1,0 +1,1464 @@
+{
+  "task": "shift_aware_adaptation_selector",
+  "divergence_threshold": 50.0,
+  "high_regret_threshold": 0.5,
+  "bootstrap_n": 10000,
+  "n_records_loaded": 309,
+  "n_cells": 12,
+  "domains": [
+    "ett_m1",
+    "finance",
+    "physionet",
+    "smd"
+  ],
+  "models": [
+    "chronos",
+    "moirai",
+    "moment"
+  ],
+  "shift_profiles": {
+    "ett_m1": [
+      9.5781,
+      0.05,
+      0.5,
+      1.5,
+      0.1
+    ],
+    "finance": [
+      0.127,
+      0.02,
+      0.2,
+      0.8,
+      0.05
+    ],
+    "smd": [
+      0.5,
+      0.03,
+      0.3,
+      1.0,
+      0.08
+    ],
+    "physionet": [
+      0.8492999999999997,
+      2.764251870481371e-06,
+      1.1292461588255478,
+      0.005400047165808219,
+      0.007916615195482812
+    ]
+  },
+  "shift_dim_names": [
+    "amplitude",
+    "spectral",
+    "acf",
+    "nonstationarity",
+    "irregularity"
+  ],
+  "arch_types": [
+    "enc_dec",
+    "enc_only",
+    "any_variate",
+    "dec_only"
+  ],
+  "strategies": [
+    {
+      "strategy": "global_best",
+      "n_folds": 4,
+      "n_cells_total": 12,
+      "mean_top1_accuracy": 0.41666666666666663,
+      "std_top1_accuracy": 0.14433756729740643,
+      "top1_ci_lower": 0.16666666666666666,
+      "top1_ci_upper": 0.6666666666666666,
+      "mean_top2_accuracy": 0.41666666666666663,
+      "mean_relative_regret": 0.015365215103573474,
+      "std_relative_regret": 0.015034943056324497,
+      "regret_ci_lower": 0.002550788611714145,
+      "regret_ci_upper": 0.0359820678300003,
+      "median_relative_regret": 0.005578805640639401,
+      "max_regret": 0.12200692085545299,
+      "high_regret_miss_rate": 0.0,
+      "mean_rank": 2.0,
+      "per_cell": [
+        {
+          "model": "chronos",
+          "domain": "ett_m1",
+          "recommended_method": "adapter",
+          "oracle_method": "adapter",
+          "recommended_mae": 0.21518123745918274,
+          "oracle_mae": 0.21518123745918274,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "moirai",
+          "domain": "ett_m1",
+          "recommended_method": "adapter",
+          "oracle_method": "full_fine_tuning",
+          "recommended_mae": 1.259916400909424,
+          "oracle_mae": 1.2326473474502564,
+          "relative_regret": 0.022122347900698315,
+          "rank": 2
+        },
+        {
+          "model": "moment",
+          "domain": "ett_m1",
+          "recommended_method": "adapter",
+          "oracle_method": "lora",
+          "recommended_mae": 1.3798887014389039,
+          "oracle_mae": 1.3674837827682496,
+          "relative_regret": 0.009071346093437793,
+          "rank": 3
+        },
+        {
+          "model": "chronos",
+          "domain": "finance",
+          "recommended_method": "adapter",
+          "oracle_method": "head_only",
+          "recommended_mae": 0.0038042102009058,
+          "oracle_mae": 0.003804136998951435,
+          "relative_regret": 1.924272295793779e-05,
+          "rank": 2
+        },
+        {
+          "model": "moirai",
+          "domain": "finance",
+          "recommended_method": "adapter",
+          "oracle_method": "full_fine_tuning",
+          "recommended_mae": 0.025034278631210327,
+          "oracle_mae": 0.02231205366551876,
+          "relative_regret": 0.12200692085545299,
+          "rank": 3
+        },
+        {
+          "model": "moment",
+          "domain": "finance",
+          "recommended_method": "adapter",
+          "oracle_method": "adapter",
+          "recommended_mae": 0.027319831028580665,
+          "oracle_mae": 0.027319831028580665,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "chronos",
+          "domain": "physionet",
+          "recommended_method": "adapter",
+          "oracle_method": "adapter",
+          "recommended_mae": 5.235743522644043,
+          "oracle_mae": 5.235743522644043,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "moirai",
+          "domain": "physionet",
+          "recommended_method": "adapter",
+          "oracle_method": "adapter",
+          "recommended_mae": 15.639523983001709,
+          "oracle_mae": 15.639523983001709,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "moment",
+          "domain": "physionet",
+          "recommended_method": "adapter",
+          "oracle_method": "lora",
+          "recommended_mae": 15.168090438842773,
+          "oracle_mae": 15.1139705657959,
+          "relative_regret": 0.0035807846000012367,
+          "rank": 4
+        },
+        {
+          "model": "chronos",
+          "domain": "smd",
+          "recommended_method": "adapter",
+          "oracle_method": "full_fine_tuning",
+          "recommended_mae": 0.008369342656806111,
+          "oracle_mae": 0.008260105783119798,
+          "relative_regret": 0.013224633746161873,
+          "rank": 2
+        },
+        {
+          "model": "moirai",
+          "domain": "smd",
+          "recommended_method": "adapter",
+          "oracle_method": "adapter",
+          "recommended_mae": 0.018167290836572647,
+          "oracle_mae": 0.018167290836572647,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "moment",
+          "domain": "smd",
+          "recommended_method": "adapter",
+          "oracle_method": "head_only",
+          "recommended_mae": 0.029787445068359376,
+          "oracle_mae": 0.02936583086848259,
+          "relative_regret": 0.014357305324171538,
+          "rank": 3
+        }
+      ]
+    },
+    {
+      "strategy": "lodo_majority",
+      "n_folds": 4,
+      "n_cells_total": 12,
+      "mean_top1_accuracy": 0.41666666666666663,
+      "std_top1_accuracy": 0.14433756729740643,
+      "top1_ci_lower": 0.16666666666666666,
+      "top1_ci_upper": 0.6666666666666666,
+      "mean_top2_accuracy": 0.41666666666666663,
+      "mean_relative_regret": 0.015365215103573474,
+      "std_relative_regret": 0.015034943056324497,
+      "regret_ci_lower": 0.002550788611714145,
+      "regret_ci_upper": 0.0359820678300003,
+      "median_relative_regret": 0.005578805640639401,
+      "max_regret": 0.12200692085545299,
+      "high_regret_miss_rate": 0.0,
+      "mean_rank": 2.0,
+      "per_cell": [
+        {
+          "model": "chronos",
+          "domain": "ett_m1",
+          "recommended_method": "adapter",
+          "oracle_method": "adapter",
+          "recommended_mae": 0.21518123745918274,
+          "oracle_mae": 0.21518123745918274,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "moirai",
+          "domain": "ett_m1",
+          "recommended_method": "adapter",
+          "oracle_method": "full_fine_tuning",
+          "recommended_mae": 1.259916400909424,
+          "oracle_mae": 1.2326473474502564,
+          "relative_regret": 0.022122347900698315,
+          "rank": 2
+        },
+        {
+          "model": "moment",
+          "domain": "ett_m1",
+          "recommended_method": "adapter",
+          "oracle_method": "lora",
+          "recommended_mae": 1.3798887014389039,
+          "oracle_mae": 1.3674837827682496,
+          "relative_regret": 0.009071346093437793,
+          "rank": 3
+        },
+        {
+          "model": "chronos",
+          "domain": "finance",
+          "recommended_method": "adapter",
+          "oracle_method": "head_only",
+          "recommended_mae": 0.0038042102009058,
+          "oracle_mae": 0.003804136998951435,
+          "relative_regret": 1.924272295793779e-05,
+          "rank": 2
+        },
+        {
+          "model": "moirai",
+          "domain": "finance",
+          "recommended_method": "adapter",
+          "oracle_method": "full_fine_tuning",
+          "recommended_mae": 0.025034278631210327,
+          "oracle_mae": 0.02231205366551876,
+          "relative_regret": 0.12200692085545299,
+          "rank": 3
+        },
+        {
+          "model": "moment",
+          "domain": "finance",
+          "recommended_method": "adapter",
+          "oracle_method": "adapter",
+          "recommended_mae": 0.027319831028580665,
+          "oracle_mae": 0.027319831028580665,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "chronos",
+          "domain": "physionet",
+          "recommended_method": "adapter",
+          "oracle_method": "adapter",
+          "recommended_mae": 5.235743522644043,
+          "oracle_mae": 5.235743522644043,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "moirai",
+          "domain": "physionet",
+          "recommended_method": "adapter",
+          "oracle_method": "adapter",
+          "recommended_mae": 15.639523983001709,
+          "oracle_mae": 15.639523983001709,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "moment",
+          "domain": "physionet",
+          "recommended_method": "adapter",
+          "oracle_method": "lora",
+          "recommended_mae": 15.168090438842773,
+          "oracle_mae": 15.1139705657959,
+          "relative_regret": 0.0035807846000012367,
+          "rank": 4
+        },
+        {
+          "model": "chronos",
+          "domain": "smd",
+          "recommended_method": "adapter",
+          "oracle_method": "full_fine_tuning",
+          "recommended_mae": 0.008369342656806111,
+          "oracle_mae": 0.008260105783119798,
+          "relative_regret": 0.013224633746161873,
+          "rank": 2
+        },
+        {
+          "model": "moirai",
+          "domain": "smd",
+          "recommended_method": "adapter",
+          "oracle_method": "adapter",
+          "recommended_mae": 0.018167290836572647,
+          "oracle_mae": 0.018167290836572647,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "moment",
+          "domain": "smd",
+          "recommended_method": "adapter",
+          "oracle_method": "head_only",
+          "recommended_mae": 0.029787445068359376,
+          "oracle_mae": 0.02936583086848259,
+          "relative_regret": 0.014357305324171538,
+          "rank": 3
+        }
+      ]
+    },
+    {
+      "strategy": "arch_default",
+      "n_folds": 4,
+      "n_cells_total": 12,
+      "mean_top1_accuracy": 0.16666666666666666,
+      "std_top1_accuracy": 0.2886751345948129,
+      "top1_ci_lower": 0.0,
+      "top1_ci_upper": 0.4166666666666667,
+      "mean_top2_accuracy": 0.16666666666666666,
+      "mean_relative_regret": 0.10077348679569431,
+      "std_relative_regret": 0.13156935816821502,
+      "regret_ci_lower": 0.00965534069141088,
+      "regret_ci_upper": 0.26541560527510494,
+      "median_relative_regret": 0.012969365037521897,
+      "max_regret": 0.9634525487799752,
+      "high_regret_miss_rate": 0.08333333333333333,
+      "mean_rank": 2.3333333333333335,
+      "per_cell": [
+        {
+          "model": "chronos",
+          "domain": "ett_m1",
+          "recommended_method": "head_only",
+          "oracle_method": "adapter",
+          "recommended_mae": 0.21779033541679382,
+          "oracle_mae": 0.21518123745918274,
+          "relative_regret": 0.012125118288280095,
+          "rank": 2
+        },
+        {
+          "model": "moirai",
+          "domain": "ett_m1",
+          "recommended_method": "adapter",
+          "oracle_method": "full_fine_tuning",
+          "recommended_mae": 1.259916400909424,
+          "oracle_mae": 1.2326473474502564,
+          "relative_regret": 0.022122347900698315,
+          "rank": 2
+        },
+        {
+          "model": "moment",
+          "domain": "ett_m1",
+          "recommended_method": "adapter",
+          "oracle_method": "lora",
+          "recommended_mae": 1.3798887014389039,
+          "oracle_mae": 1.3674837827682496,
+          "relative_regret": 0.009071346093437793,
+          "rank": 3
+        },
+        {
+          "model": "chronos",
+          "domain": "finance",
+          "recommended_method": "adapter",
+          "oracle_method": "head_only",
+          "recommended_mae": 0.0038042102009058,
+          "oracle_mae": 0.003804136998951435,
+          "relative_regret": 1.924272295793779e-05,
+          "rank": 2
+        },
+        {
+          "model": "moirai",
+          "domain": "finance",
+          "recommended_method": "adapter",
+          "oracle_method": "full_fine_tuning",
+          "recommended_mae": 0.025034278631210327,
+          "oracle_mae": 0.02231205366551876,
+          "relative_regret": 0.12200692085545299,
+          "rank": 3
+        },
+        {
+          "model": "moment",
+          "domain": "finance",
+          "recommended_method": "lora",
+          "oracle_method": "adapter",
+          "recommended_mae": 0.02804456353187561,
+          "oracle_mae": 0.027319831028580665,
+          "relative_regret": 0.026527708115645615,
+          "rank": 3
+        },
+        {
+          "model": "chronos",
+          "domain": "physionet",
+          "recommended_method": "adapter",
+          "oracle_method": "adapter",
+          "recommended_mae": 5.235743522644043,
+          "oracle_mae": 5.235743522644043,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "moirai",
+          "domain": "physionet",
+          "recommended_method": "full_fine_tuning",
+          "oracle_method": "adapter",
+          "recommended_mae": 16.19953842163086,
+          "oracle_mae": 15.639523983001709,
+          "relative_regret": 0.03580763962111752,
+          "rank": 3
+        },
+        {
+          "model": "moment",
+          "domain": "physionet",
+          "recommended_method": "lora",
+          "oracle_method": "lora",
+          "recommended_mae": 15.1139705657959,
+          "oracle_mae": 15.1139705657959,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "chronos",
+          "domain": "smd",
+          "recommended_method": "adapter",
+          "oracle_method": "full_fine_tuning",
+          "recommended_mae": 0.008369342656806111,
+          "oracle_mae": 0.008260105783119798,
+          "relative_regret": 0.013224633746161873,
+          "rank": 2
+        },
+        {
+          "model": "moirai",
+          "domain": "smd",
+          "recommended_method": "full_fine_tuning",
+          "oracle_method": "adapter",
+          "recommended_mae": 0.03567061349749565,
+          "oracle_mae": 0.018167290836572647,
+          "relative_regret": 0.9634525487799752,
+          "rank": 4
+        },
+        {
+          "model": "moment",
+          "domain": "smd",
+          "recommended_method": "lora",
+          "oracle_method": "head_only",
+          "recommended_mae": 0.029510438069701196,
+          "oracle_mae": 0.02936583086848259,
+          "relative_regret": 0.004924335424604248,
+          "rank": 2
+        }
+      ]
+    },
+    {
+      "strategy": "nearest_neighbor",
+      "n_folds": 4,
+      "n_cells_total": 12,
+      "mean_top1_accuracy": 0.25,
+      "std_top1_accuracy": 0.14433756729740643,
+      "top1_ci_lower": 0.0,
+      "top1_ci_upper": 0.5,
+      "mean_top2_accuracy": 0.25,
+      "mean_relative_regret": 0.2902159862835624,
+      "std_relative_regret": 0.3541963292622975,
+      "regret_ci_lower": 0.008641920480645032,
+      "regret_ci_upper": 0.7783090359877833,
+      "median_relative_regret": 0.014856048247444666,
+      "max_regret": 2.5941798973602364,
+      "high_regret_miss_rate": 0.16666666666666666,
+      "mean_rank": 2.5,
+      "per_cell": [
+        {
+          "model": "chronos",
+          "domain": "ett_m1",
+          "recommended_method": "adapter",
+          "oracle_method": "adapter",
+          "recommended_mae": 0.21518123745918274,
+          "oracle_mae": 0.21518123745918274,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "moirai",
+          "domain": "ett_m1",
+          "recommended_method": "adapter",
+          "oracle_method": "full_fine_tuning",
+          "recommended_mae": 1.259916400909424,
+          "oracle_mae": 1.2326473474502564,
+          "relative_regret": 0.022122347900698315,
+          "rank": 2
+        },
+        {
+          "model": "moment",
+          "domain": "ett_m1",
+          "recommended_method": "adapter",
+          "oracle_method": "lora",
+          "recommended_mae": 1.3798887014389039,
+          "oracle_mae": 1.3674837827682496,
+          "relative_regret": 0.009071346093437793,
+          "rank": 3
+        },
+        {
+          "model": "chronos",
+          "domain": "finance",
+          "recommended_method": "full_fine_tuning",
+          "oracle_method": "head_only",
+          "recommended_mae": 0.0038042696658521892,
+          "oracle_mae": 0.003804136998951435,
+          "relative_regret": 3.487437513178848e-05,
+          "rank": 3
+        },
+        {
+          "model": "moirai",
+          "domain": "finance",
+          "recommended_method": "full_fine_tuning",
+          "oracle_method": "full_fine_tuning",
+          "recommended_mae": 0.02231205366551876,
+          "oracle_mae": 0.02231205366551876,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "moment",
+          "domain": "finance",
+          "recommended_method": "full_fine_tuning",
+          "oracle_method": "adapter",
+          "recommended_mae": 0.0281974658370018,
+          "oracle_mae": 0.027319831028580665,
+          "relative_regret": 0.03212445960968777,
+          "rank": 4
+        },
+        {
+          "model": "chronos",
+          "domain": "physionet",
+          "recommended_method": "full_fine_tuning(fallback)",
+          "oracle_method": "adapter",
+          "recommended_mae": 18.81820411682129,
+          "oracle_mae": 5.235743522644043,
+          "relative_regret": 2.5941798973602364,
+          "rank": 4
+        },
+        {
+          "model": "moirai",
+          "domain": "physionet",
+          "recommended_method": "full_fine_tuning",
+          "oracle_method": "adapter",
+          "recommended_mae": 16.19953842163086,
+          "oracle_mae": 15.639523983001709,
+          "relative_regret": 0.03580763962111752,
+          "rank": 3
+        },
+        {
+          "model": "moment",
+          "domain": "physionet",
+          "recommended_method": "full_fine_tuning",
+          "oracle_method": "lora",
+          "recommended_mae": 15.141587448120116,
+          "oracle_mae": 15.1139705657959,
+          "relative_regret": 0.0018272420343808595,
+          "rank": 3
+        },
+        {
+          "model": "chronos",
+          "domain": "smd",
+          "recommended_method": "head_only",
+          "oracle_method": "full_fine_tuning",
+          "recommended_mae": 0.008379962667822838,
+          "oracle_mae": 0.008260105783119798,
+          "relative_regret": 0.014510332900091561,
+          "rank": 3
+        },
+        {
+          "model": "moirai",
+          "domain": "smd",
+          "recommended_method": "head_only",
+          "oracle_method": "adapter",
+          "recommended_mae": 0.032209038734436035,
+          "oracle_mae": 0.018167290836572647,
+          "relative_regret": 0.7729136955079668,
+          "rank": 2
+        },
+        {
+          "model": "moment",
+          "domain": "smd",
+          "recommended_method": "head_only",
+          "oracle_method": "head_only",
+          "recommended_mae": 0.02936583086848259,
+          "oracle_mae": 0.02936583086848259,
+          "relative_regret": 0.0,
+          "rank": 1
+        }
+      ]
+    },
+    {
+      "strategy": "regret_weighted_nn",
+      "n_folds": 4,
+      "n_cells_total": 12,
+      "mean_top1_accuracy": 0.41666666666666663,
+      "std_top1_accuracy": 0.14433756729740643,
+      "top1_ci_lower": 0.16666666666666666,
+      "top1_ci_upper": 0.6666666666666666,
+      "mean_top2_accuracy": 0.41666666666666663,
+      "mean_relative_regret": 0.09488312951024999,
+      "std_relative_regret": 0.13495887562026895,
+      "regret_ci_lower": 0.003373829482844397,
+      "regret_ci_upper": 0.2619535695120225,
+      "median_relative_regret": 0.006858737996718061,
+      "max_regret": 0.9634525487799752,
+      "high_regret_miss_rate": 0.08333333333333333,
+      "mean_rank": 2.25,
+      "per_cell": [
+        {
+          "model": "chronos",
+          "domain": "ett_m1",
+          "recommended_method": "adapter",
+          "oracle_method": "adapter",
+          "recommended_mae": 0.21518123745918274,
+          "oracle_mae": 0.21518123745918274,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "moirai",
+          "domain": "ett_m1",
+          "recommended_method": "adapter",
+          "oracle_method": "full_fine_tuning",
+          "recommended_mae": 1.259916400909424,
+          "oracle_mae": 1.2326473474502564,
+          "relative_regret": 0.022122347900698315,
+          "rank": 2
+        },
+        {
+          "model": "moment",
+          "domain": "ett_m1",
+          "recommended_method": "adapter",
+          "oracle_method": "lora",
+          "recommended_mae": 1.3798887014389039,
+          "oracle_mae": 1.3674837827682496,
+          "relative_regret": 0.009071346093437793,
+          "rank": 3
+        },
+        {
+          "model": "chronos",
+          "domain": "finance",
+          "recommended_method": "adapter",
+          "oracle_method": "head_only",
+          "recommended_mae": 0.0038042102009058,
+          "oracle_mae": 0.003804136998951435,
+          "relative_regret": 1.924272295793779e-05,
+          "rank": 2
+        },
+        {
+          "model": "moirai",
+          "domain": "finance",
+          "recommended_method": "adapter",
+          "oracle_method": "full_fine_tuning",
+          "recommended_mae": 0.025034278631210327,
+          "oracle_mae": 0.02231205366551876,
+          "relative_regret": 0.12200692085545299,
+          "rank": 3
+        },
+        {
+          "model": "moment",
+          "domain": "finance",
+          "recommended_method": "adapter",
+          "oracle_method": "adapter",
+          "recommended_mae": 0.027319831028580665,
+          "oracle_mae": 0.027319831028580665,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "chronos",
+          "domain": "physionet",
+          "recommended_method": "adapter",
+          "oracle_method": "adapter",
+          "recommended_mae": 5.235743522644043,
+          "oracle_mae": 5.235743522644043,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "moirai",
+          "domain": "physionet",
+          "recommended_method": "adapter",
+          "oracle_method": "adapter",
+          "recommended_mae": 15.639523983001709,
+          "oracle_mae": 15.639523983001709,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "moment",
+          "domain": "physionet",
+          "recommended_method": "adapter",
+          "oracle_method": "lora",
+          "recommended_mae": 15.168090438842773,
+          "oracle_mae": 15.1139705657959,
+          "relative_regret": 0.0035807846000012367,
+          "rank": 4
+        },
+        {
+          "model": "chronos",
+          "domain": "smd",
+          "recommended_method": "full_fine_tuning",
+          "oracle_method": "full_fine_tuning",
+          "recommended_mae": 0.008260105783119798,
+          "oracle_mae": 0.008260105783119798,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "moirai",
+          "domain": "smd",
+          "recommended_method": "full_fine_tuning",
+          "oracle_method": "adapter",
+          "recommended_mae": 0.03567061349749565,
+          "oracle_mae": 0.018167290836572647,
+          "relative_regret": 0.9634525487799752,
+          "rank": 4
+        },
+        {
+          "model": "moment",
+          "domain": "smd",
+          "recommended_method": "full_fine_tuning",
+          "oracle_method": "head_only",
+          "recommended_mae": 0.029904528334736825,
+          "oracle_mae": 0.02936583086848259,
+          "relative_regret": 0.01834436317047651,
+          "rank": 4
+        }
+      ]
+    },
+    {
+      "strategy": "logistic_meta",
+      "n_folds": 4,
+      "n_cells_total": 12,
+      "mean_top1_accuracy": 0.3333333333333333,
+      "std_top1_accuracy": 0.0,
+      "top1_ci_lower": 0.08333333333333333,
+      "top1_ci_upper": 0.5833333333333334,
+      "mean_top2_accuracy": 0.3333333333333333,
+      "mean_relative_regret": 0.018349185071999934,
+      "std_relative_regret": 0.012968668576326043,
+      "regret_ci_lower": 0.004478779703355007,
+      "regret_ci_upper": 0.039676212244058234,
+      "median_relative_regret": 0.00647400179063971,
+      "max_regret": 0.12200692085545299,
+      "high_regret_miss_rate": 0.0,
+      "mean_rank": 2.1666666666666665,
+      "per_cell": [
+        {
+          "model": "chronos",
+          "domain": "ett_m1",
+          "recommended_method": "adapter",
+          "oracle_method": "adapter",
+          "recommended_mae": 0.21518123745918274,
+          "oracle_mae": 0.21518123745918274,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "moirai",
+          "domain": "ett_m1",
+          "recommended_method": "adapter",
+          "oracle_method": "full_fine_tuning",
+          "recommended_mae": 1.259916400909424,
+          "oracle_mae": 1.2326473474502564,
+          "relative_regret": 0.022122347900698315,
+          "rank": 2
+        },
+        {
+          "model": "moment",
+          "domain": "ett_m1",
+          "recommended_method": "adapter",
+          "oracle_method": "lora",
+          "recommended_mae": 1.3798887014389039,
+          "oracle_mae": 1.3674837827682496,
+          "relative_regret": 0.009071346093437793,
+          "rank": 3
+        },
+        {
+          "model": "chronos",
+          "domain": "finance",
+          "recommended_method": "adapter",
+          "oracle_method": "head_only",
+          "recommended_mae": 0.0038042102009058,
+          "oracle_mae": 0.003804136998951435,
+          "relative_regret": 1.924272295793779e-05,
+          "rank": 2
+        },
+        {
+          "model": "moirai",
+          "domain": "finance",
+          "recommended_method": "adapter",
+          "oracle_method": "full_fine_tuning",
+          "recommended_mae": 0.025034278631210327,
+          "oracle_mae": 0.02231205366551876,
+          "relative_regret": 0.12200692085545299,
+          "rank": 3
+        },
+        {
+          "model": "moment",
+          "domain": "finance",
+          "recommended_method": "adapter",
+          "oracle_method": "adapter",
+          "recommended_mae": 0.027319831028580665,
+          "oracle_mae": 0.027319831028580665,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "chronos",
+          "domain": "physionet",
+          "recommended_method": "adapter",
+          "oracle_method": "adapter",
+          "recommended_mae": 5.235743522644043,
+          "oracle_mae": 5.235743522644043,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "moirai",
+          "domain": "physionet",
+          "recommended_method": "full_fine_tuning",
+          "oracle_method": "adapter",
+          "recommended_mae": 16.19953842163086,
+          "oracle_mae": 15.639523983001709,
+          "relative_regret": 0.03580763962111752,
+          "rank": 3
+        },
+        {
+          "model": "moment",
+          "domain": "physionet",
+          "recommended_method": "adapter",
+          "oracle_method": "lora",
+          "recommended_mae": 15.168090438842773,
+          "oracle_mae": 15.1139705657959,
+          "relative_regret": 0.0035807846000012367,
+          "rank": 4
+        },
+        {
+          "model": "chronos",
+          "domain": "smd",
+          "recommended_method": "adapter",
+          "oracle_method": "full_fine_tuning",
+          "recommended_mae": 0.008369342656806111,
+          "oracle_mae": 0.008260105783119798,
+          "relative_regret": 0.013224633746161873,
+          "rank": 2
+        },
+        {
+          "model": "moirai",
+          "domain": "smd",
+          "recommended_method": "adapter",
+          "oracle_method": "adapter",
+          "recommended_mae": 0.018167290836572647,
+          "oracle_mae": 0.018167290836572647,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "moment",
+          "domain": "smd",
+          "recommended_method": "adapter",
+          "oracle_method": "head_only",
+          "recommended_mae": 0.029787445068359376,
+          "oracle_mae": 0.02936583086848259,
+          "relative_regret": 0.014357305324171538,
+          "rank": 3
+        }
+      ]
+    },
+    {
+      "strategy": "random_forest",
+      "n_folds": 4,
+      "n_cells_total": 12,
+      "mean_top1_accuracy": 0.0,
+      "std_top1_accuracy": 0.0,
+      "top1_ci_lower": 0.0,
+      "top1_ci_upper": 0.0,
+      "mean_top2_accuracy": 0.0,
+      "mean_relative_regret": 0.3210373796697943,
+      "std_relative_regret": 0.34261009902470524,
+      "regret_ci_lower": 0.020944272585565683,
+      "regret_ci_upper": 0.8160132385173502,
+      "median_relative_regret": 0.023579842841607326,
+      "max_regret": 2.5941798973602364,
+      "high_regret_miss_rate": 0.16666666666666666,
+      "mean_rank": 2.75,
+      "per_cell": [
+        {
+          "model": "chronos",
+          "domain": "ett_m1",
+          "recommended_method": "full_fine_tuning",
+          "oracle_method": "adapter",
+          "recommended_mae": 0.22746112942695618,
+          "oracle_mae": 0.21518123745918274,
+          "relative_regret": 0.05706767054958859,
+          "rank": 3
+        },
+        {
+          "model": "moirai",
+          "domain": "ett_m1",
+          "recommended_method": "adapter",
+          "oracle_method": "full_fine_tuning",
+          "recommended_mae": 1.259916400909424,
+          "oracle_mae": 1.2326473474502564,
+          "relative_regret": 0.022122347900698315,
+          "rank": 2
+        },
+        {
+          "model": "moment",
+          "domain": "ett_m1",
+          "recommended_method": "head_only",
+          "oracle_method": "lora",
+          "recommended_mae": 1.3763057231903075,
+          "oracle_mae": 1.3674837827682496,
+          "relative_regret": 0.006451221238031344,
+          "rank": 2
+        },
+        {
+          "model": "chronos",
+          "domain": "finance",
+          "recommended_method": "full_fine_tuning",
+          "oracle_method": "head_only",
+          "recommended_mae": 0.0038042696658521892,
+          "oracle_mae": 0.003804136998951435,
+          "relative_regret": 3.487437513178848e-05,
+          "rank": 3
+        },
+        {
+          "model": "moirai",
+          "domain": "finance",
+          "recommended_method": "adapter",
+          "oracle_method": "full_fine_tuning",
+          "recommended_mae": 0.025034278631210327,
+          "oracle_mae": 0.02231205366551876,
+          "relative_regret": 0.12200692085545299,
+          "rank": 3
+        },
+        {
+          "model": "moment",
+          "domain": "finance",
+          "recommended_method": "head_only",
+          "oracle_method": "adapter",
+          "recommended_mae": 0.02792174369096756,
+          "oracle_mae": 0.027319831028580665,
+          "relative_regret": 0.022032078520441926,
+          "rank": 2
+        },
+        {
+          "model": "chronos",
+          "domain": "physionet",
+          "recommended_method": "full_fine_tuning(fallback)",
+          "oracle_method": "adapter",
+          "recommended_mae": 18.81820411682129,
+          "oracle_mae": 5.235743522644043,
+          "relative_regret": 2.5941798973602364,
+          "rank": 4
+        },
+        {
+          "model": "moirai",
+          "domain": "physionet",
+          "recommended_method": "full_fine_tuning",
+          "oracle_method": "adapter",
+          "recommended_mae": 16.19953842163086,
+          "oracle_mae": 15.639523983001709,
+          "relative_regret": 0.03580763962111752,
+          "rank": 3
+        },
+        {
+          "model": "moment",
+          "domain": "physionet",
+          "recommended_method": "head_only",
+          "oracle_method": "lora",
+          "recommended_mae": 15.139836883544922,
+          "oracle_mae": 15.1139705657959,
+          "relative_regret": 0.0017114177665238993,
+          "rank": 2
+        },
+        {
+          "model": "chronos",
+          "domain": "smd",
+          "recommended_method": "adapter",
+          "oracle_method": "full_fine_tuning",
+          "recommended_mae": 0.008369342656806111,
+          "oracle_mae": 0.008260105783119798,
+          "relative_regret": 0.013224633746161873,
+          "rank": 2
+        },
+        {
+          "model": "moirai",
+          "domain": "smd",
+          "recommended_method": "full_fine_tuning",
+          "oracle_method": "adapter",
+          "recommended_mae": 0.03567061349749565,
+          "oracle_mae": 0.018167290836572647,
+          "relative_regret": 0.9634525487799752,
+          "rank": 4
+        },
+        {
+          "model": "moment",
+          "domain": "smd",
+          "recommended_method": "adapter",
+          "oracle_method": "head_only",
+          "recommended_mae": 0.029787445068359376,
+          "oracle_mae": 0.02936583086848259,
+          "relative_regret": 0.014357305324171538,
+          "rank": 3
+        }
+      ]
+    },
+    {
+      "strategy": "decision_tree",
+      "n_folds": 4,
+      "n_cells_total": 12,
+      "mean_top1_accuracy": 0.0,
+      "std_top1_accuracy": 0.0,
+      "top1_ci_lower": 0.0,
+      "top1_ci_upper": 0.0,
+      "mean_top2_accuracy": 0.0,
+      "mean_relative_regret": 0.32040577677660564,
+      "std_relative_regret": 0.34284576298268576,
+      "regret_ci_lower": 0.020114847336000517,
+      "regret_ci_upper": 0.8151345856397608,
+      "median_relative_regret": 0.023296674947104908,
+      "max_regret": 2.5941798973602364,
+      "high_regret_miss_rate": 0.16666666666666666,
+      "mean_rank": 2.75,
+      "per_cell": [
+        {
+          "model": "chronos",
+          "domain": "ett_m1",
+          "recommended_method": "full_fine_tuning",
+          "oracle_method": "adapter",
+          "recommended_mae": 0.22746112942695618,
+          "oracle_mae": 0.21518123745918274,
+          "relative_regret": 0.05706767054958859,
+          "rank": 3
+        },
+        {
+          "model": "moirai",
+          "domain": "ett_m1",
+          "recommended_method": "adapter",
+          "oracle_method": "full_fine_tuning",
+          "recommended_mae": 1.259916400909424,
+          "oracle_mae": 1.2326473474502564,
+          "relative_regret": 0.022122347900698315,
+          "rank": 2
+        },
+        {
+          "model": "moment",
+          "domain": "ett_m1",
+          "recommended_method": "head_only",
+          "oracle_method": "lora",
+          "recommended_mae": 1.3763057231903075,
+          "oracle_mae": 1.3674837827682496,
+          "relative_regret": 0.006451221238031344,
+          "rank": 2
+        },
+        {
+          "model": "chronos",
+          "domain": "finance",
+          "recommended_method": "adapter",
+          "oracle_method": "head_only",
+          "recommended_mae": 0.0038042102009058,
+          "oracle_mae": 0.003804136998951435,
+          "relative_regret": 1.924272295793779e-05,
+          "rank": 2
+        },
+        {
+          "model": "moirai",
+          "domain": "finance",
+          "recommended_method": "adapter",
+          "oracle_method": "full_fine_tuning",
+          "recommended_mae": 0.025034278631210327,
+          "oracle_mae": 0.02231205366551876,
+          "relative_regret": 0.12200692085545299,
+          "rank": 3
+        },
+        {
+          "model": "moment",
+          "domain": "finance",
+          "recommended_method": "head_only",
+          "oracle_method": "adapter",
+          "recommended_mae": 0.02792174369096756,
+          "oracle_mae": 0.027319831028580665,
+          "relative_regret": 0.022032078520441926,
+          "rank": 2
+        },
+        {
+          "model": "chronos",
+          "domain": "physionet",
+          "recommended_method": "full_fine_tuning(fallback)",
+          "oracle_method": "adapter",
+          "recommended_mae": 18.81820411682129,
+          "oracle_mae": 5.235743522644043,
+          "relative_regret": 2.5941798973602364,
+          "rank": 4
+        },
+        {
+          "model": "moirai",
+          "domain": "physionet",
+          "recommended_method": "full_fine_tuning",
+          "oracle_method": "adapter",
+          "recommended_mae": 16.19953842163086,
+          "oracle_mae": 15.639523983001709,
+          "relative_regret": 0.03580763962111752,
+          "rank": 3
+        },
+        {
+          "model": "moment",
+          "domain": "physionet",
+          "recommended_method": "adapter",
+          "oracle_method": "lora",
+          "recommended_mae": 15.168090438842773,
+          "oracle_mae": 15.1139705657959,
+          "relative_regret": 0.0035807846000012367,
+          "rank": 4
+        },
+        {
+          "model": "chronos",
+          "domain": "smd",
+          "recommended_method": "adapter",
+          "oracle_method": "full_fine_tuning",
+          "recommended_mae": 0.008369342656806111,
+          "oracle_mae": 0.008260105783119798,
+          "relative_regret": 0.013224633746161873,
+          "rank": 2
+        },
+        {
+          "model": "moirai",
+          "domain": "smd",
+          "recommended_method": "full_fine_tuning",
+          "oracle_method": "adapter",
+          "recommended_mae": 0.03567061349749565,
+          "oracle_mae": 0.018167290836572647,
+          "relative_regret": 0.9634525487799752,
+          "rank": 4
+        },
+        {
+          "model": "moment",
+          "domain": "smd",
+          "recommended_method": "lora",
+          "oracle_method": "head_only",
+          "recommended_mae": 0.029510438069701196,
+          "oracle_mae": 0.02936583086848259,
+          "relative_regret": 0.004924335424604248,
+          "rank": 2
+        }
+      ]
+    },
+    {
+      "strategy": "oracle",
+      "n_folds": 4,
+      "n_cells_total": 12,
+      "mean_top1_accuracy": 1.0,
+      "std_top1_accuracy": 0.0,
+      "top1_ci_lower": 1.0,
+      "top1_ci_upper": 1.0,
+      "mean_top2_accuracy": 1.0,
+      "mean_relative_regret": 0.0,
+      "std_relative_regret": 0.0,
+      "regret_ci_lower": 0.0,
+      "regret_ci_upper": 0.0,
+      "median_relative_regret": 0.0,
+      "max_regret": 0.0,
+      "high_regret_miss_rate": 0.0,
+      "mean_rank": 1.0,
+      "per_cell": [
+        {
+          "model": "chronos",
+          "domain": "ett_m1",
+          "recommended_method": "adapter",
+          "oracle_method": "adapter",
+          "recommended_mae": 0.21518123745918274,
+          "oracle_mae": 0.21518123745918274,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "moirai",
+          "domain": "ett_m1",
+          "recommended_method": "full_fine_tuning",
+          "oracle_method": "full_fine_tuning",
+          "recommended_mae": 1.2326473474502564,
+          "oracle_mae": 1.2326473474502564,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "moment",
+          "domain": "ett_m1",
+          "recommended_method": "lora",
+          "oracle_method": "lora",
+          "recommended_mae": 1.3674837827682496,
+          "oracle_mae": 1.3674837827682496,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "chronos",
+          "domain": "finance",
+          "recommended_method": "head_only",
+          "oracle_method": "head_only",
+          "recommended_mae": 0.003804136998951435,
+          "oracle_mae": 0.003804136998951435,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "moirai",
+          "domain": "finance",
+          "recommended_method": "full_fine_tuning",
+          "oracle_method": "full_fine_tuning",
+          "recommended_mae": 0.02231205366551876,
+          "oracle_mae": 0.02231205366551876,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "moment",
+          "domain": "finance",
+          "recommended_method": "adapter",
+          "oracle_method": "adapter",
+          "recommended_mae": 0.027319831028580665,
+          "oracle_mae": 0.027319831028580665,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "chronos",
+          "domain": "physionet",
+          "recommended_method": "adapter",
+          "oracle_method": "adapter",
+          "recommended_mae": 5.235743522644043,
+          "oracle_mae": 5.235743522644043,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "moirai",
+          "domain": "physionet",
+          "recommended_method": "adapter",
+          "oracle_method": "adapter",
+          "recommended_mae": 15.639523983001709,
+          "oracle_mae": 15.639523983001709,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "moment",
+          "domain": "physionet",
+          "recommended_method": "lora",
+          "oracle_method": "lora",
+          "recommended_mae": 15.1139705657959,
+          "oracle_mae": 15.1139705657959,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "chronos",
+          "domain": "smd",
+          "recommended_method": "full_fine_tuning",
+          "oracle_method": "full_fine_tuning",
+          "recommended_mae": 0.008260105783119798,
+          "oracle_mae": 0.008260105783119798,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "moirai",
+          "domain": "smd",
+          "recommended_method": "adapter",
+          "oracle_method": "adapter",
+          "recommended_mae": 0.018167290836572647,
+          "oracle_mae": 0.018167290836572647,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "moment",
+          "domain": "smd",
+          "recommended_method": "head_only",
+          "oracle_method": "head_only",
+          "recommended_mae": 0.02936583086848259,
+          "oracle_mae": 0.02936583086848259,
+          "relative_regret": 0.0,
+          "rank": 1
+        }
+      ]
+    },
+    {
+      "strategy": "random",
+      "n_folds": 4,
+      "n_cells_total": 12,
+      "mean_top1_accuracy": 0.3333333333333333,
+      "std_top1_accuracy": 0.3333333333333333,
+      "top1_ci_lower": 0.08333333333333333,
+      "top1_ci_upper": 0.5833333333333334,
+      "mean_top2_accuracy": 0.3333333333333333,
+      "mean_relative_regret": 0.26427592413761547,
+      "std_relative_regret": 0.22707339193110304,
+      "regret_ci_lower": 0.022311251543830984,
+      "regret_ci_upper": 0.6234734891973766,
+      "median_relative_regret": 0.009938085465451873,
+      "max_regret": 1.8312934092421842,
+      "high_regret_miss_rate": 0.16666666666666666,
+      "mean_rank": 2.25,
+      "per_cell": [
+        {
+          "model": "chronos",
+          "domain": "ett_m1",
+          "recommended_method": "adapter",
+          "oracle_method": "adapter",
+          "recommended_mae": 0.21518123745918274,
+          "oracle_mae": 0.21518123745918274,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "moirai",
+          "domain": "ett_m1",
+          "recommended_method": "lora",
+          "oracle_method": "full_fine_tuning",
+          "recommended_mae": 1.380424928665161,
+          "oracle_mae": 1.2326473474502564,
+          "relative_regret": 0.11988634179969164,
+          "rank": 3
+        },
+        {
+          "model": "moment",
+          "domain": "ett_m1",
+          "recommended_method": "lora",
+          "oracle_method": "lora",
+          "recommended_mae": 1.3674837827682496,
+          "oracle_mae": 1.3674837827682496,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "chronos",
+          "domain": "finance",
+          "recommended_method": "adapter",
+          "oracle_method": "head_only",
+          "recommended_mae": 0.0038042102009058,
+          "oracle_mae": 0.003804136998951435,
+          "relative_regret": 1.924272295793779e-05,
+          "rank": 2
+        },
+        {
+          "model": "moirai",
+          "domain": "finance",
+          "recommended_method": "lora",
+          "oracle_method": "full_fine_tuning",
+          "recommended_mae": 0.02731505557894707,
+          "oracle_mae": 0.02231205366551876,
+          "relative_regret": 0.22422866081395237,
+          "rank": 4
+        },
+        {
+          "model": "moment",
+          "domain": "finance",
+          "recommended_method": "lora",
+          "oracle_method": "adapter",
+          "recommended_mae": 0.02804456353187561,
+          "oracle_mae": 0.027319831028580665,
+          "relative_regret": 0.026527708115645615,
+          "rank": 3
+        },
+        {
+          "model": "chronos",
+          "domain": "physionet",
+          "recommended_method": "adapter",
+          "oracle_method": "adapter",
+          "recommended_mae": 5.235743522644043,
+          "oracle_mae": 5.235743522644043,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "moirai",
+          "domain": "physionet",
+          "recommended_method": "lora(fallback)",
+          "oracle_method": "adapter",
+          "recommended_mae": 44.28008117675781,
+          "oracle_mae": 15.639523983001709,
+          "relative_regret": 1.8312934092421842,
+          "rank": 4
+        },
+        {
+          "model": "moment",
+          "domain": "physionet",
+          "recommended_method": "lora",
+          "oracle_method": "lora",
+          "recommended_mae": 15.1139705657959,
+          "oracle_mae": 15.1139705657959,
+          "relative_regret": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "chronos",
+          "domain": "smd",
+          "recommended_method": "adapter",
+          "oracle_method": "full_fine_tuning",
+          "recommended_mae": 0.008369342656806111,
+          "oracle_mae": 0.008260105783119798,
+          "relative_regret": 0.013224633746161873,
+          "rank": 2
+        },
+        {
+          "model": "moirai",
+          "domain": "smd",
+          "recommended_method": "lora",
+          "oracle_method": "adapter",
+          "recommended_mae": 0.03544814065098763,
+          "oracle_mae": 0.018167290836572647,
+          "relative_regret": 0.9512067577861875,
+          "rank": 3
+        },
+        {
+          "model": "moment",
+          "domain": "smd",
+          "recommended_method": "lora",
+          "oracle_method": "head_only",
+          "recommended_mae": 0.029510438069701196,
+          "oracle_mae": 0.02936583086848259,
+          "relative_regret": 0.004924335424604248,
+          "rank": 2
+        }
+      ]
+    }
+  ]
+}

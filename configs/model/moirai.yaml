@@ -1,0 +1,7 @@
+name: moirai
+hf_id: "Salesforce/moirai-1.1-R-base"
+architecture: any_variate_transformer
+num_layers: 12
+hidden_size: 768
+context_length: 512
+prediction_length: 96

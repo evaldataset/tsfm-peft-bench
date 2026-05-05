@@ -1,0 +1,7 @@
+name: chronos
+hf_id: "amazon/chronos-t5-base"
+architecture: t5_encoder_decoder
+num_layers: 12
+hidden_size: 768
+context_length: 512
+prediction_length: 64  # Chronos-T5-Base native limit
