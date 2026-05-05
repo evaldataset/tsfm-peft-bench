@@ -79,6 +79,7 @@
   "rai:dataAnnotationProtocol": "Records are deterministic outputs of the training pipeline; no human annotation. Each (model, method, domain, seed) combination is a single run. Reproducibility is supported by Hydra-frozen configs, requirements-lock.txt, and python scripts/reproduce_paper_tables.py (regenerates the paper's headline numbers end-to-end).",
   "rai:dataAnnotationDemographics": "Not applicable: no human-subject annotation. PhysioNet 2012 includes ICU patient demographics (age, sex) used downstream by the underlying dataset but not by our forecasting evaluation, which uses heart-rate (HR) only.",
   "rai:dataAnnotationsPerItem": "1 (each run is annotated with metrics, config, and parameter counts by the training script).",
+  "rai:hasSyntheticData": false,
   "rai:dataReleaseMaintenancePlan": "Public repository hosted on Hugging Face Datasets (and mirrored on Anonymous-4-Open-Science during review). Versioned releases via git tags. Bug reports and rerun requests via the repository issue tracker. Authors commit to maintaining the dataset at least until NeurIPS 2027 main meeting.",
   "rai:dataLimitation": [
     "Evaluation grid is 12 cells (3 architectures x 4 domains); bootstrap CIs on selector top-1 are wide (Wilson [17%, 67%]).",
