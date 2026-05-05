@@ -371,7 +371,6 @@
     }
   ],
   "sameAs": [
-    "https://github.com/evaldataset/tsfm-peft-bench",
-    "https://anonymous.4open.science/r/tsfm-peft-bench-anon"
+    "https://anonymous.4open.science/r/tsfm-peft-bench"
   ]
 }

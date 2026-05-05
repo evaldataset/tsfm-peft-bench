@@ -15,7 +15,8 @@ Track).
   (3 architectures × 4 domains × 6 main methods + rank/locus sweeps)
 - **Reproduction in one command:**
   `python scripts/reproduce_paper_tables.py`
-- **Code repository:** [github.com/evaldataset/tsfm-peft-bench](https://github.com/evaldataset/tsfm-peft-bench)
+- **Code repository (anonymous review):** [https://anonymous.4open.science/r/tsfm-peft-bench](https://anonymous.4open.science/r/tsfm-peft-bench)
+- **Code repository (GitHub mirror, post-acceptance):** [github.com/evaldataset/tsfm-peft-bench](https://github.com/evaldataset/tsfm-peft-bench)
 - **Dataset (Hugging Face):** [EvalData/tsfm-peft-bench](https://huggingface.co/datasets/EvalData/tsfm-peft-bench) — 972 run records + Croissant 1.0
 
 ---
