@@ -100,7 +100,20 @@ _ARCH_MAP: dict[str, str] = {
 
 _ARCH_TYPES: list[str] = ["enc_dec", "enc_only", "any_variate", "dec_only"]
 
-# MAE 발산 임계값 (이 값 초과 시 해당 seed 결과 제외)
+# Divergence filter for the selector LOOCV pipeline.
+#
+# Pipeline-level note: the per-architecture ANOVA in
+# scripts/reproduce_paper_tables.py uses the per-cell scale-aware rule
+# 'MAE > 10 * same-(model, domain) zero-shot baseline'. This selector script
+# uses an absolute threshold (50.0) for two reasons: (i) the selector pool
+# already excludes prefix-tuning and is restricted to five primary methods,
+# so the cell-level outliers are concentrated on Chronos+LoRA+ETTm1
+# (mean 105+) and Chronos+Full-FT+PhysioNet (1400+), both of which exceed
+# any reasonable absolute or scale-aware cutoff; (ii) Appendix
+# sec:filter-sens shows that the selector plurality and LODO top-1 are
+# invariant for k in {5, 10, 20, infinity} under the scale-aware rule, so
+# the two rules are operationally equivalent at the (model, domain, method)
+# aggregation level used by the selector.
 _DIVERGENCE_THRESHOLD: float = 50.0
 
 # Regret 경고 임계값

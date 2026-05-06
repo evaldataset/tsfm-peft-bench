@@ -3,16 +3,26 @@ data/
 *.csv
 *.parquet
 
-# Raw run outputs (heavy; available via Hugging Face dataset)
+# Raw run outputs (heavy, not for release)
+results/
 results/expansion/
 results/cluster_logs/
 results/wandb/
-checkpoints/
-*.pt
-*.pth
-*.ckpt
-*.safetensors
-*.bin
+# but DO track paper-essential artifacts so reviewers can verify numbers
+!results/paper_manifest.json
+!results/paper_numbers.json
+!results/paper_numbers.tex
+!results/selector_evaluation.json
+!results/selector_table.tex
+!results/selector_per_cell_detail.json
+!results/expansion_analysis_canonical/
+!results/expansion_analysis_canonical/**
+!results/expansion_analysis_v3/
+!results/expansion_analysis_v3/**
+!results/pivot_analysis/
+!results/pivot_analysis/**
+!results/cka_analysis/
+!results/cka_analysis/**
 
 # Python
 __pycache__/
@@ -22,39 +32,32 @@ __pycache__/
 dist/
 build/
 .eggs/
-.venv/
-venv/
 
 # Environment
 .env
 *.env
+venv/
+.venv/
 
-# IDE / OS
+# IDE
 .vscode/
 .idea/
 *.swp
-.DS_Store
+*.swo
 
-# Logs
-logs/
+# Jupyter
+.ipynb_checkpoints/
+
+# Weights & Biases
 wandb/
-cluster_logs/
 
-# LaTeX build artifacts
-*.aux
-*.bbl
-*.blg
-*.fdb_latexmk
-*.fls
-*.log
-*.out
-*.synctex.gz
-*.toc
+# Models
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.bin
 
-# Internal planning (not in submission)
-.sisyphus/
-.omc/
-.claude/
-
-# Agent/IDE state
-SUBMISSION_INTERNAL/
+# OS
+.DS_Store
+Thumbs.db
